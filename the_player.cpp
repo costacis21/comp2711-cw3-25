@@ -3,6 +3,7 @@
 //
 
 #include "the_player.h"
+#include <QMouseEvent>
 
 using namespace std;
 
@@ -33,4 +34,12 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
 void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
     play();
+}
+
+void ThePlayer::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        pause();
+
+    }
 }

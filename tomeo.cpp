@@ -140,9 +140,21 @@ int main(int argc, char *argv[]) {
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
 
+    QPushButton *pauseWidget = new QPushButton("Pause");
+    QPushButton *playWidget = new QPushButton("Play");
+
+
     // add the video and the buttons to the top level widget
     top->addWidget(videoWidget);
     top->addWidget(buttonWidget);
+    top->addWidget(pauseWidget);
+    top->addWidget(playWidget);
+
+
+
+    QObject::connect(playWidget, SIGNAL(clicked()), player, SLOT(play()));
+    QObject::connect(pauseWidget, SIGNAL(clicked()), player, SLOT(pause()));
+
 
     // showtime!
     window.show();
