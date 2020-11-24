@@ -3,7 +3,6 @@
 //
 
 #include "the_player.h"
-#include <QMouseEvent>
 
 using namespace std;
 
@@ -35,4 +34,3 @@ void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
     play();
 }
-
