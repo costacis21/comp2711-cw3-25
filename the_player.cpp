@@ -36,10 +36,3 @@ void ThePlayer::jumpTo (TheButtonInfo* button) {
     play();
 }
 
-void ThePlayer::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        pause();
-
-    }
-}
