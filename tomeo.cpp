@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
+#include <QSlider>
 #include "the_player.h"
 #include "the_button.h"
 
@@ -142,6 +143,9 @@ int main(int argc, char *argv[]) {
 
     QPushButton *pauseWidget = new QPushButton("Pause");
     QPushButton *playWidget = new QPushButton("Play");
+    QSlider *volumeSlider = new QSlider(Qt::Horizontal);
+    volumeSlider->setMaximum(100);
+    volumeSlider->setMinimum(0);
 
 
     // add the video and the buttons to the top level widget
@@ -149,11 +153,13 @@ int main(int argc, char *argv[]) {
     top->addWidget(buttonWidget);
     top->addWidget(pauseWidget);
     top->addWidget(playWidget);
+    top->addWidget(volumeSlider);
 
 
 
     QObject::connect(playWidget, SIGNAL(clicked()), player, SLOT(play()));
     QObject::connect(pauseWidget, SIGNAL(clicked()), player, SLOT(pause()));
+    QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
 
 
     // showtime!

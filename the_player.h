@@ -49,6 +49,7 @@ public slots:
 
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
+    void setVolumeSlot(int vol);
 };
 
 #endif //CW2_THE_PLAYER_H

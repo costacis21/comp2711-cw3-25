@@ -34,3 +34,8 @@ void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
     play();
 }
+
+void ThePlayer::setVolumeSlot(int vol){
+    setVolume(vol);
+}
+
