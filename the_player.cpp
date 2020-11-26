@@ -3,6 +3,7 @@
 //
 
 #include "the_player.h"
+#include <stdio.h>
 
 using namespace std;
 
@@ -10,6 +11,7 @@ using namespace std;
 void ThePlayer::setContent(std::vector<TheButton*>* b, std::vector<TheButtonInfo>* i) {
     buttons = b;
     infos = i;
+
     jumpTo(buttons -> at(0) -> info);
 }
 
@@ -32,6 +34,7 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
 
 void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
+    emit namechange(QString(button->url->toString()));
     play();
 }
 
@@ -50,3 +53,36 @@ void ThePlayer::changePlayPause(){
     status=!status;
 
 }
+
+void ThePlayer::forward(){
+    currVid++;
+
+    if(currVid>buttons->size()-1)
+        currVid=0;
+    jumpTo(buttons->at(currVid)->info);
+}
+
+void ThePlayer::backwards(){
+    currVid--;
+
+    if(currVid<0)
+        currVid=buttons->size()-1;
+    jumpTo(buttons->at(currVid)->info);
+}
+
+void ThePlayer::timedurationS(qint64 time){
+    long milli = time;
+    //3600000 milliseconds in an hour
+    long hr = milli / 3600000;
+    milli = milli - 3600000 * hr;
+    //60000 milliseconds in a minute
+    long min = milli / 60000;
+    milli = milli - 60000 * min;
+    //1000 milliseconds in a second
+    long sec = milli / 1000;
+    milli = milli - 1000 * sec;
+    QString formatedTime=  QString(QString::number(hr) + ":" + QString::number(min) + ":" + QString::number(sec) + ":" + QString::number(milli) );
+    emit timeduration(formatedTime);
+}
+
+

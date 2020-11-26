@@ -22,6 +22,7 @@
 #include <QtWidgets/QFileIconProvider>
 #include <QDesktopServices>
 #include <QImageReader>
+#include <QLabel>
 #include <QMessageBox>
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
@@ -29,6 +30,8 @@
 #include "the_player.h"
 #include "the_button.h"
 #include "play_pause.h"
+#include "forward_button.h"
+#include "backward_button.h"
 
 
 using namespace std;
@@ -142,12 +145,17 @@ int main(int argc, char *argv[]) {
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
 
+
+
     QWidget *controlsWidget = new QWidget();
     QHBoxLayout *controlsLayout = new QHBoxLayout();
+
+
     controlsWidget->setLayout(controlsLayout);
 
     playpauseButton *playpause = new playpauseButton(controlsWidget);
-
+    ForwardButton *forwardButton = new ForwardButton(controlsWidget);
+    BackwardButton *backwardButton = new BackwardButton(controlsWidget);
 
 
 
@@ -163,16 +171,31 @@ int main(int argc, char *argv[]) {
     speedControl->setValue(5);
     speedControl->setTickInterval(1);
 
+
     controlsLayout->addWidget(speedControl);
+    controlsLayout->addWidget(backwardButton);
     controlsLayout->addWidget(playpause);
+    controlsLayout->addWidget(forwardButton);
     controlsLayout->addWidget(volumeSlider);
 
 
+    QWidget *infoWidgets = new QWidget();
+    QHBoxLayout *infoLayout = new QHBoxLayout();
 
-    // add the video and the buttons to the top level widget
+    infoWidgets->setLayout(infoLayout);
+
+    QLabel *title = new QLabel(infoWidgets);
+    infoLayout->addWidget(title);
+    QLabel *time = new QLabel(infoWidgets);
+    infoLayout->addWidget(time);
+
+
+
+    // add video, the buttons and controls to the top level widget
     top->addWidget(videoWidget);
     top->addWidget(buttonWidget);
     top->addWidget(controlsWidget);
+    top->addWidget(infoWidgets);
 
 
 
@@ -184,8 +207,12 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
 
+    QObject::connect(forwardButton, SIGNAL(clicked()), player, SLOT(forward()));
+    QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
 
+    QObject::connect(player, SIGNAL(namechange(QString)), title, SLOT(setText(QString)));
 
+    QObject::connect(player, SIGNAL(timeduration(QString)), time, SLOT(setText(QString)));
 
 
     // showtime!

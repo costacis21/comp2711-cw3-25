@@ -8,12 +8,16 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        backward_button.cpp \
+        forward_button.cpp \
         play_pause.cpp \
         the_button.cpp \
         the_player.cpp \
         tomeo.cpp
 
 HEADERS += \
+    backward_button.h \
+    forward_button.h \
     play_pause.h \
     the_button.h \
     the_player.h

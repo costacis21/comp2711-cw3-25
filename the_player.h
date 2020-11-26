@@ -23,13 +23,14 @@ private:
     vector<TheButton*>* buttons;
     QTimer* mTimer;
     long updateCount = 0;
+    int currVid=0;
 
 public:
     bool status=false;
     ThePlayer() : QMediaPlayer(NULL) {
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
-
+        connect(this,SIGNAL(durationChanged(qint64)),this,SLOT( timedurationS(qint64 )));
         mTimer = new QTimer(NULL);
         mTimer->setInterval(1000); // 1000ms is one second between ...
         mTimer->start();
@@ -46,6 +47,7 @@ private slots:
 
     void playStateChanged (QMediaPlayer::State ms);
 
+
 public slots:
 
     // start playing this ButtonInfo
@@ -53,6 +55,14 @@ public slots:
     void setVolumeSlot(int vol);
     void setSpeed(int speed);
     void changePlayPause();
+    void forward();
+    void backwards();
+    void timedurationS(qint64 );
+
+signals:
+    void namechange(QString);
+    void timeduration(QString);
+
 
 };
 

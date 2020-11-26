@@ -2,9 +2,7 @@
 #define PLAY_PAUSE_H
 
 #include <QPushButton>
-#include <QKeyEvent>
 #include <QIcon>
-#include <QMediaPlayer>
 #include "the_player.h"
 
 
