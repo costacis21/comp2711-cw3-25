@@ -39,3 +39,14 @@ void ThePlayer::setVolumeSlot(int vol){
     setVolume(vol);
 }
 
+void ThePlayer::setSpeed(int speed){
+    setPlaybackRate((qreal)speed*0.2);
+}
+void ThePlayer::changePlayPause(){
+    if (this->status)
+        play();
+    else
+        pause();
+    status=!status;
+
+}

@@ -25,6 +25,7 @@ private:
     long updateCount = 0;
 
 public:
+    bool status=false;
     ThePlayer() : QMediaPlayer(NULL) {
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
@@ -50,6 +51,9 @@ public slots:
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
     void setVolumeSlot(int vol);
+    void setSpeed(int speed);
+    void changePlayPause();
+
 };
 
 #endif //CW2_THE_PLAYER_H

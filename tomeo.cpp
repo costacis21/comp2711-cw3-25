@@ -28,6 +28,7 @@
 #include <QSlider>
 #include "the_player.h"
 #include "the_button.h"
+#include "play_pause.h"
 
 
 using namespace std;
@@ -141,25 +142,50 @@ int main(int argc, char *argv[]) {
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
 
-    QPushButton *pauseWidget = new QPushButton("Pause");
-    QPushButton *playWidget = new QPushButton("Play");
+    QWidget *controlsWidget = new QWidget();
+    QHBoxLayout *controlsLayout = new QHBoxLayout();
+    controlsWidget->setLayout(controlsLayout);
+
+    playpauseButton *playpause = new playpauseButton(controlsWidget);
+
+
+
+
     QSlider *volumeSlider = new QSlider(Qt::Horizontal);
+    volumeSlider->setParent(controlsWidget);
     volumeSlider->setMaximum(100);
     volumeSlider->setMinimum(0);
+
+    QSlider *speedControl = new QSlider(Qt::Horizontal);
+    speedControl->setParent(controlsWidget);
+    speedControl->setMaximum(10);
+    speedControl->setMinimum(1);
+    speedControl->setValue(5);
+    speedControl->setTickInterval(1);
+
+    controlsLayout->addWidget(speedControl);
+    controlsLayout->addWidget(playpause);
+    controlsLayout->addWidget(volumeSlider);
+
 
 
     // add the video and the buttons to the top level widget
     top->addWidget(videoWidget);
     top->addWidget(buttonWidget);
-    top->addWidget(pauseWidget);
-    top->addWidget(playWidget);
-    top->addWidget(volumeSlider);
+    top->addWidget(controlsWidget);
 
 
 
-    QObject::connect(playWidget, SIGNAL(clicked()), player, SLOT(play()));
-    QObject::connect(pauseWidget, SIGNAL(clicked()), player, SLOT(pause()));
+
+
+
     QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
+    QObject::connect(speedControl, SIGNAL(valueChanged(int)), player, SLOT(setSpeed(int)));
+
+    QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
+
+
+
 
 
     // showtime!
