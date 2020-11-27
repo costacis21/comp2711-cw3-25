@@ -26,7 +26,9 @@ private:
     int currVid=0;
 
 public:
-    bool status=false;
+    bool playstatus=true;//true for play
+    bool repeatOn=true;
+    bool shuffleOn=false;
     ThePlayer() : QMediaPlayer(NULL) {
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
@@ -35,6 +37,7 @@ public:
         mTimer->setInterval(1000); // 1000ms is one second between ...
         mTimer->start();
         connect( mTimer, SIGNAL (timeout()), SLOT ( shuffle() ) ); // ...running shuffle method
+        ;
     }
 
     // all buttons have been setup, store pointers here
@@ -58,12 +61,14 @@ public slots:
     void forward();
     void backwards();
     void timedurationS(qint64 );
+    void changeRepeat();
+    void seek(int);
+
 
 signals:
     void namechange(QString);
     void timeduration(QString);
-
-
+    void timeS(int,int);
 };
 
 #endif //CW2_THE_PLAYER_H

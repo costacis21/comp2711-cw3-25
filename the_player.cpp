@@ -25,11 +25,21 @@ void ThePlayer::shuffle() {
 void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
     switch (ms) {
         case QMediaPlayer::State::StoppedState:
-            play(); // starting playing again...
+                if(repeatOn){
+                    setPosition(0);
+                    play(); // starting playing again...
+                }
+                else if(shuffleOn)
+                    setMedia(*buttons -> at( updateCount++ % buttons->size())->info->url);
+                else
+                    stop();
+
             break;
     default:
         break;
     }
+
+
 }
 
 void ThePlayer::jumpTo (TheButtonInfo* button) {
@@ -46,11 +56,11 @@ void ThePlayer::setSpeed(int speed){
     setPlaybackRate((qreal)speed*0.2);
 }
 void ThePlayer::changePlayPause(){
-    if (this->status)
-        play();
-    else
+    if (this->playstatus)
         pause();
-    status=!status;
+    else
+        play();
+    playstatus=!playstatus;
 
 }
 
@@ -81,8 +91,26 @@ void ThePlayer::timedurationS(qint64 time){
     //1000 milliseconds in a second
     long sec = milli / 1000;
     milli = milli - 1000 * sec;
-    QString formatedTime=  QString(QString::number(hr) + ":" + QString::number(min) + ":" + QString::number(sec) + ":" + QString::number(milli) );
+    QString formatedTime=QString(QString::number(min) + ":" + QString::number(sec) );
+
+    if(hr==0)
+        QString formatedTime=  QString(QString::number(min) + ":" + QString::number(sec) );
+    else
+        QString formatedTime=  QString(QString::number(hr) + ":"+QString::number(min) + ":" + QString::number(sec) );
+
+
     emit timeduration(formatedTime);
+    emit timeS(0,int(time));
+}
+
+void ThePlayer::changeRepeat(){
+
+    this->repeatOn=!this->repeatOn;
+
+}
+
+void ThePlayer::seek(int time){
+    setPosition(qint64(time));
 }
 
 

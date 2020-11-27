@@ -27,11 +27,15 @@
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QSlider>
+#include <QComboBox>
 #include "the_player.h"
 #include "the_button.h"
 #include "play_pause.h"
 #include "forward_button.h"
 #include "backward_button.h"
+#include "repeat_button.h"
+#include "shuffle_button.h"
+#include "time_slider.h"
 
 
 using namespace std;
@@ -145,40 +149,82 @@ int main(int argc, char *argv[]) {
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
 
+//first line of controls
 
-
-    QWidget *controlsWidget = new QWidget();
-    QHBoxLayout *controlsLayout = new QHBoxLayout();
-
-
-    controlsWidget->setLayout(controlsLayout);
-
-    playpauseButton *playpause = new playpauseButton(controlsWidget);
-    ForwardButton *forwardButton = new ForwardButton(controlsWidget);
-    BackwardButton *backwardButton = new BackwardButton(controlsWidget);
+    QWidget *controlsWidget_1 = new QWidget();
+    QHBoxLayout *controlsLayout_1 = new QHBoxLayout();
 
 
 
-    QSlider *volumeSlider = new QSlider(Qt::Horizontal);
-    volumeSlider->setParent(controlsWidget);
+    controlsWidget_1->setLayout(controlsLayout_1);
+
+
+    QLabel *currTimeLabel = new QLabel(controlsWidget_1);
+    playpauseButton *playpause = new playpauseButton(controlsWidget_1);
+    TimeSlider *timeSlider = new TimeSlider(controlsWidget_1);
+    timeSlider->setOrientation(Qt::Horizontal);
+
+
+
+    QSlider *volumeSlider = new QSlider(Qt::Vertical);
+    volumeSlider->setParent(controlsWidget_1);
     volumeSlider->setMaximum(100);
     volumeSlider->setMinimum(0);
 
+    QComboBox *settingsComboBox = new QComboBox(controlsWidget_1);
+    settingsComboBox->addItem("Settings");
+    settingsComboBox->setItemIcon(0,QIcon(":/icons/gear_settings.png"));
+
+    settingsComboBox->addItem("Playback Speed");
+    settingsComboBox->addItem("FullScreen");
+    settingsComboBox->addItem("Quality");
+
+
+
+    controlsLayout_1->addWidget(playpause);
+    controlsLayout_1->addWidget(volumeSlider);
+    controlsLayout_1->addWidget(timeSlider);
+    controlsLayout_1->addWidget(currTimeLabel);
+    controlsLayout_1->addWidget(settingsComboBox);
+
+
+
+
+
+//second line of controls
+    QWidget *controlsWidget_2 = new QWidget();
+    QHBoxLayout *controlsLayout_2 = new QHBoxLayout();
+    controlsLayout_2->setSpacing(8);
+
+    controlsWidget_2->setLayout(controlsLayout_2);
+
+    ForwardButton *forwardButton = new ForwardButton(controlsWidget_2);
+    BackwardButton *backwardButton = new BackwardButton(controlsWidget_2);
+    RepeatButton *repeatOn = new RepeatButton(controlsWidget_2);
+    ShuffleButton *shuffleOn= new ShuffleButton(controlsWidget_2);
+
+
     QSlider *speedControl = new QSlider(Qt::Horizontal);
-    speedControl->setParent(controlsWidget);
+    speedControl->setParent(controlsWidget_2);
     speedControl->setMaximum(10);
     speedControl->setMinimum(1);
     speedControl->setValue(5);
     speedControl->setTickInterval(1);
 
 
-    controlsLayout->addWidget(speedControl);
-    controlsLayout->addWidget(backwardButton);
-    controlsLayout->addWidget(playpause);
-    controlsLayout->addWidget(forwardButton);
-    controlsLayout->addWidget(volumeSlider);
+//    controlsLayout_2->addWidget(speedControl);
+    controlsLayout_2->addWidget(repeatOn,10);
+    controlsLayout_2->addWidget(shuffleOn,10);
+    controlsLayout_2->addWidget(backwardButton,10);
+    controlsLayout_2->addWidget(forwardButton,10);
+    controlsLayout_2->addWidget(repeatOn,10);
 
 
+
+
+
+
+//third line of controls
     QWidget *infoWidgets = new QWidget();
     QHBoxLayout *infoLayout = new QHBoxLayout();
 
@@ -193,8 +239,10 @@ int main(int argc, char *argv[]) {
 
     // add video, the buttons and controls to the top level widget
     top->addWidget(videoWidget);
+    top->addWidget(controlsWidget_1);
+    top->addWidget(controlsWidget_2);
+
     top->addWidget(buttonWidget);
-    top->addWidget(controlsWidget);
     top->addWidget(infoWidgets);
 
 
@@ -202,17 +250,30 @@ int main(int argc, char *argv[]) {
 
 
 
+
+//volume and speed connections
     QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
     QObject::connect(speedControl, SIGNAL(valueChanged(int)), player, SLOT(setSpeed(int)));
 
+//playpause button connection
     QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
 
+//repeat shuffle connection
+    QObject::connect(repeatOn, SIGNAL(clicked()), player, SLOT(changeRepeat()));
+
+//time position of video connections
+    QObject::connect(player, SIGNAL( positionChanged(qint64)), timeSlider, SLOT(setValueqint(qint64)));
+    QObject::connect(timeSlider, SIGNAL(valueChanged(int)), player, SLOT(seek(int)));
+    QObject::connect(player, SIGNAL(timeS(int,int)), timeSlider, SLOT(setRange(int,int)));//changes range of slider to accomodate new video
+
+//next previous button connections
     QObject::connect(forwardButton, SIGNAL(clicked()), player, SLOT(forward()));
     QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
-
+//info label connections
     QObject::connect(player, SIGNAL(namechange(QString)), title, SLOT(setText(QString)));
+    QObject::connect(player, SIGNAL(timeduration(QString)), currTimeLabel, SLOT(setText(QString)));
 
-    QObject::connect(player, SIGNAL(timeduration(QString)), time, SLOT(setText(QString)));
+
 
 
     // showtime!

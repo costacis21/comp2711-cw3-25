@@ -10,7 +10,7 @@
 
 class playpauseButton : public QPushButton {
     Q_OBJECT
-    bool state;//true for play
+    bool state=false;//true for play
 
 public:
 
