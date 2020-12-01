@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
 
     // create the main window and layout
     QWidget window;
-    QVBoxLayout *top = new QVBoxLayout();
+    QGridLayout *top = new QGridLayout();
     window.setLayout(top);
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
@@ -170,6 +170,7 @@ int main(int argc, char *argv[]) {
     volumeSlider->setParent(controlsWidget_1);
     volumeSlider->setMaximum(100);
     volumeSlider->setMinimum(0);
+    volumeSlider->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
 
     QComboBox *settingsComboBox = new QComboBox(controlsWidget_1);
     settingsComboBox->addItem("Settings");
@@ -204,20 +205,20 @@ int main(int argc, char *argv[]) {
     ShuffleButton *shuffleOn= new ShuffleButton(controlsWidget_2);
 
 
-    QSlider *speedControl = new QSlider(Qt::Horizontal);
-    speedControl->setParent(controlsWidget_2);
-    speedControl->setMaximum(10);
-    speedControl->setMinimum(1);
-    speedControl->setValue(5);
-    speedControl->setTickInterval(1);
+//    QSlider *speedControl = new QSlider(Qt::Horizontal);
+//    speedControl->setParent(controlsWidget_2);
+//    speedControl->setMaximum(10);
+//    speedControl->setMinimum(1);
+//    speedControl->setValue(5);
+//    speedControl->setTickInterval(1);
 
 
 //    controlsLayout_2->addWidget(speedControl);
-    controlsLayout_2->addWidget(repeatOn,10);
-    controlsLayout_2->addWidget(shuffleOn,10);
-    controlsLayout_2->addWidget(backwardButton,10);
-    controlsLayout_2->addWidget(forwardButton,10);
-    controlsLayout_2->addWidget(repeatOn,10);
+    controlsLayout_2->addWidget(repeatOn,0);
+    controlsLayout_2->addWidget(shuffleOn,0);
+    controlsLayout_2->addWidget(backwardButton,0);
+    controlsLayout_2->addWidget(forwardButton,0);
+    controlsLayout_2->addWidget(repeatOn,0);
 
 
 
@@ -236,14 +237,16 @@ int main(int argc, char *argv[]) {
     infoLayout->addWidget(time);
 
 
-
     // add video, the buttons and controls to the top level widget
-    top->addWidget(videoWidget);
-    top->addWidget(controlsWidget_1);
-    top->addWidget(controlsWidget_2);
+//    videoWidget->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
+    top->addWidget(videoWidget,0,0,10,1);
+    top->addWidget(controlsWidget_1,10,0,1,1);
+    top->addWidget(controlsWidget_2,11,0,1,1);
+    QLabel *buttonInstructions = new QLabel("Select a video to play");
+    top->addWidget(buttonInstructions,12,0,1,1);
 
-    top->addWidget(buttonWidget);
-    top->addWidget(infoWidgets);
+    top->addWidget(buttonWidget,13,0,1,1);
+    top->addWidget(infoWidgets,14,0,1,1);
 
 
 
@@ -253,7 +256,7 @@ int main(int argc, char *argv[]) {
 
 //volume and speed connections
     QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
-    QObject::connect(speedControl, SIGNAL(valueChanged(int)), player, SLOT(setSpeed(int)));
+//    QObject::connect(speedControl, SIGNAL(valueChanged(int)), player, SLOT(setSpeed(int)));
 
 //playpause button connection
     QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));

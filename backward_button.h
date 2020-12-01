@@ -10,7 +10,7 @@ class BackwardButton : public QPushButton {
 public:
 
      BackwardButton(QWidget *parent) :  QPushButton(parent) {
-         setIcon(QIcon(":/icons/backward.png"));
+         setIcon(QIcon(":/icons/previous.png"));
          QWidget::setFixedSize(QSize(50,50));
      }
 

@@ -28,7 +28,7 @@ private:
 public:
     bool playstatus=true;//true for play
     bool repeatOn=true;
-    bool shuffleOn=false;
+    bool shuffleOn=true;
     ThePlayer() : QMediaPlayer(NULL) {
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
@@ -37,7 +37,7 @@ public:
         mTimer->setInterval(1000); // 1000ms is one second between ...
         mTimer->start();
         connect( mTimer, SIGNAL (timeout()), SLOT ( shuffle() ) ); // ...running shuffle method
-        ;
+
     }
 
     // all buttons have been setup, store pointers here

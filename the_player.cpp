@@ -29,9 +29,10 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
                     setPosition(0);
                     play(); // starting playing again...
                 }
-                else if(shuffleOn)
+                else if(shuffleOn){
                     setMedia(*buttons -> at( updateCount++ % buttons->size())->info->url);
-                else
+                    play();
+                }else
                     stop();
 
             break;

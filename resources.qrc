@@ -10,5 +10,7 @@
         <file>icons/shuffleOff.png</file>
         <file>icons/shuffleOn.png</file>
         <file>icons/gear_settings.png</file>
+        <file>icons/next.png</file>
+        <file>icons/previous.png</file>
     </qresource>
 </RCC>
