@@ -204,16 +204,6 @@ int main(int argc, char *argv[]) {
     RepeatButton *repeatOn = new RepeatButton(controlsWidget_2);
     ShuffleButton *shuffleOn= new ShuffleButton(controlsWidget_2);
 
-
-//    QSlider *speedControl = new QSlider(Qt::Horizontal);
-//    speedControl->setParent(controlsWidget_2);
-//    speedControl->setMaximum(10);
-//    speedControl->setMinimum(1);
-//    speedControl->setValue(5);
-//    speedControl->setTickInterval(1);
-
-
-//    controlsLayout_2->addWidget(speedControl);
     controlsLayout_2->addWidget(repeatOn,0);
     controlsLayout_2->addWidget(shuffleOn,0);
     controlsLayout_2->addWidget(backwardButton,0);
@@ -238,7 +228,6 @@ int main(int argc, char *argv[]) {
 
 
     // add video, the buttons and controls to the top level widget
-//    videoWidget->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
     top->addWidget(videoWidget,0,0,10,1);
     top->addWidget(controlsWidget_1,10,0,1,1);
     top->addWidget(controlsWidget_2,11,0,1,1);
@@ -256,7 +245,6 @@ int main(int argc, char *argv[]) {
 
 //volume and speed connections
     QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
-//    QObject::connect(speedControl, SIGNAL(valueChanged(int)), player, SLOT(setSpeed(int)));
 
 //playpause button connection
     QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));

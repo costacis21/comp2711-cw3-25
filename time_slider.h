@@ -9,7 +9,6 @@ public:
 
      TimeSlider(QWidget *parent) :  QSlider(parent) {
          this->setOrientation(Qt::Horizontal);
-//         this->minimumSizeHint()=QSize(0,100);
      }
 
      void init();
