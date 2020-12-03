@@ -18,6 +18,7 @@ public:
          setIcon(QIcon(":/icons/pause.png"));
          setIconSize(QSize(50,50));
          connect(this, SIGNAL(clicked()), this, SLOT (playpauseclicked())); // if QPushButton clicked...then run playpauseclicked() below
+         setFlat(true);
 
      }
 

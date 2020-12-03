@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.13.2, 2020-12-01T07:00:01. -->
+<!-- Written by QtCreator 4.13.2, 2020-12-03T19:04:28. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -323,9 +323,8 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">the2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/giorgos/Documents/comp 2811 UI/comp2711-cw3-25/the.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/giorgos/Documents/comp 2811 UI/comp2711-cw3-25/the.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/giorgos/Desktop/comp2711-cw3-25-main/the.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/giorgos/Desktop/comp2711-cw3-25-main/the.pro</value>
     <value type="QString" key="RunConfiguration.Arguments">&quot;/home/giorgos/Downloads/videos&quot;</value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>

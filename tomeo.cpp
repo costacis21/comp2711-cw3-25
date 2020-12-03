@@ -28,6 +28,8 @@
 #include <QtCore/QDirIterator>
 #include <QSlider>
 #include <QComboBox>
+#include <QToolBar>
+
 #include "the_player.h"
 #include "the_button.h"
 #include "play_pause.h"
@@ -39,6 +41,28 @@
 
 
 using namespace std;
+bool volumeVisible;
+QSlider *volumeSlider;
+QComboBox *playbackComboBox;
+ThePlayer *player;
+playpauseButton *playpause;
+ForwardButton *forwardButton;
+BackwardButton *backwardButton;
+RepeatButton *repeatOn;
+ShuffleButton *shuffleOn;
+TimeSlider *timeSlider;
+QLabel *currTimeLabel ;
+QAction *help;
+QMessageBox *helpBox;
+QGridLayout *top;
+QVideoWidget *videoWidget;
+QWidget *controlsWidget_1;
+QWidget *controlsWidget_2;
+QLabel *buttonInstructions;
+QWidget *buttonWidget;
+QToolBar *toolBar;
+QWidget *menuWidget;
+QPushButton *volumeButton;
 
 // read in videos and thumbnails to this directory
 vector<TheButtonInfo> getInfoIn (string loc) {
@@ -80,6 +104,140 @@ vector<TheButtonInfo> getInfoIn (string loc) {
 }
 
 
+void createConnections(){
+    volumeVisible=false;
+    //show volume controll connection
+
+    QObject::connect(volumeButton, &QPushButton::clicked,
+                    [=]() { volumeVisible=!volumeVisible;volumeSlider->setVisible(volumeVisible); }
+                );
+    //volume and speed connections
+        QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
+        QObject::connect(playbackComboBox, QOverload<int>::of(&QComboBox::activated),
+            [=](int index){ if(!index){player->setPlaybackRate(1);}else{player->setPlaybackRate(0.5* index); }});
+
+
+    //playpause button connection
+        QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
+
+    //repeat shuffle connection
+        QObject::connect(repeatOn, SIGNAL(clicked()), player, SLOT(changeRepeat()));
+
+    //time position of video connections
+        QObject::connect(player, SIGNAL( positionChanged(qint64)), timeSlider, SLOT(setValueqint(qint64)));
+        QObject::connect(timeSlider, SIGNAL(valueChanged(int)), player, SLOT(seek(int)));
+        QObject::connect(player, SIGNAL(timeS(int,int)), timeSlider, SLOT(setRange(int,int)));//changes range of slider to accomodate new video
+
+    //next previous button connections
+        QObject::connect(forwardButton, SIGNAL(clicked()), player, SLOT(forward()));
+        QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
+    //info label connections
+        QObject::connect(player, SIGNAL(timeduration(QString)), currTimeLabel, SLOT(setText(QString)));
+
+    //toolbar connection
+        QObject::connect(help, SIGNAL(hovered()), helpBox,SLOT(exec()));
+
+}
+
+void createControls(){
+    //first line of controls
+
+        controlsWidget_1 = new QWidget();
+        QHBoxLayout *controlsLayout_1 = new QHBoxLayout();
+
+
+
+        controlsWidget_1->setLayout(controlsLayout_1);
+        volumeButton = new QPushButton();
+        volumeButton->setIcon(QIcon(":/icons/volume.png"));
+        volumeButton->setIconSize(QSize(30,30));
+
+
+
+        currTimeLabel = new QLabel(controlsWidget_1);
+        currTimeLabel->setStyleSheet("font:15pt;");
+        playpause = new playpauseButton(controlsWidget_1);
+        timeSlider = new TimeSlider(controlsWidget_1);
+        timeSlider->setOrientation(Qt::Horizontal);
+
+
+
+        volumeSlider = new QSlider(Qt::Vertical);
+        volumeSlider->setParent(controlsWidget_1);
+        volumeSlider->setMaximum(100);
+        volumeSlider->setMinimum(0);
+        volumeSlider->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
+
+        volumeSlider->setVisible(false);
+
+        playbackComboBox = new QComboBox(controlsWidget_1);
+        playbackComboBox->setStyleSheet("font:15pt");
+        playbackComboBox->addItem("Playback Speed");
+        playbackComboBox->addItem("x0.5");
+        playbackComboBox->addItem("x1.0");
+        playbackComboBox->addItem("x1.5");
+        playbackComboBox->addItem("x2.0");
+
+
+
+        controlsLayout_1->addWidget(playpause);
+        controlsLayout_1->addWidget(volumeButton);
+        controlsLayout_1->addWidget(volumeSlider);
+        controlsLayout_1->addWidget(timeSlider);
+        controlsLayout_1->addWidget(currTimeLabel);
+        controlsLayout_1->addWidget(playbackComboBox);
+
+
+
+
+
+    //second line of controls
+        controlsWidget_2 = new QWidget();
+        QHBoxLayout *controlsLayout_2 = new QHBoxLayout();
+        controlsLayout_2->setSpacing(8);
+
+        controlsWidget_2->setLayout(controlsLayout_2);
+
+        forwardButton = new ForwardButton(controlsWidget_2);
+        backwardButton = new BackwardButton(controlsWidget_2);
+        repeatOn = new RepeatButton(controlsWidget_2);
+        shuffleOn= new ShuffleButton(controlsWidget_2);
+
+        controlsLayout_2->addWidget(repeatOn,0);
+        controlsLayout_2->addWidget(shuffleOn,0);
+        controlsLayout_2->addWidget(backwardButton,0);
+        controlsLayout_2->addWidget(forwardButton,0);
+        controlsLayout_2->addWidget(repeatOn,0);
+}
+
+
+void addToTop(){
+
+    // add video, the buttons and controls to the top level widget
+    top->addWidget(videoWidget,1,0,10,1);
+    top->addWidget(controlsWidget_1,11,0,1,1);
+    top->addWidget(controlsWidget_2,12,0,1,1);
+
+    top->addWidget(buttonInstructions,13,0,1,1);
+
+    top->addWidget(buttonWidget,14,0,1,1);
+    top->addWidget(toolBar,0,0);
+
+}
+
+void createToolBox(){
+    menuWidget = new QWidget();
+
+    toolBar = new QToolBar(menuWidget);
+    help = new QAction();
+    help->setText("Help");
+    helpBox = new QMessageBox();
+    helpBox->setText("For help please visit our site\n\nwww.tomeo.doesnotexist.com");
+    helpBox->setStandardButtons(QMessageBox::Ok);
+    helpBox->setWindowTitle("Help");
+    toolBar->addAction(help);
+}
+
 int main(int argc, char *argv[]) {
 
     // let's just check that Qt is operational first
@@ -96,33 +254,21 @@ int main(int argc, char *argv[]) {
 
     if (videos.size() == 0) {
 
-        const int result = QMessageBox::question(
-                    NULL,
-                    QString("Tomeo"),
-                    QString("no videos found! download, unzip, and add command line argument to \"quoted\" file location. Download videos from Tom's OneDrive?"),
-                    QMessageBox::Yes |
-                    QMessageBox::No );
-
-        switch( result )
-        {
-        case QMessageBox::Yes:
-          QDesktopServices::openUrl(QUrl("https://leeds365-my.sharepoint.com/:u:/g/personal/scstke_leeds_ac_uk/EcGntcL-K3JOiaZF4T_uaA4BHn6USbq2E55kF_BTfdpPag?e=n1qfuN"));
-          break;
-        default:
-            break;
-        }
+        QMessageBox *alert;
+        alert->setText("No videos in arguments");
+        alert->exec();
         exit(-1);
     }
 
     // the widget that will show the video
-    QVideoWidget *videoWidget = new QVideoWidget;
+    videoWidget = new QVideoWidget;
 
     // the QMediaPlayer which controls the playback
-    ThePlayer *player = new ThePlayer;
+    player = new ThePlayer;
     player->setVideoOutput(videoWidget);
 
     // a row of buttons
-    QWidget *buttonWidget = new QWidget();
+    buttonWidget = new QWidget();
     // a list of the buttons
     vector<TheButton*> buttons;
     // the buttons are arranged horizontally
@@ -144,125 +290,22 @@ int main(int argc, char *argv[]) {
 
     // create the main window and layout
     QWidget window;
-    QGridLayout *top = new QGridLayout();
+    window.setStyleSheet("background-color:#FFFFFF;");
+
+    top = new QGridLayout();
     window.setLayout(top);
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
 
-//first line of controls
-
-    QWidget *controlsWidget_1 = new QWidget();
-    QHBoxLayout *controlsLayout_1 = new QHBoxLayout();
 
 
+    buttonInstructions = new QLabel("Select a video to play");
+    buttonInstructions->setStyleSheet("font:18pt;font-weight: bold;");
+    createToolBox();
+    createControls();
+    addToTop();
+    createConnections();
 
-    controlsWidget_1->setLayout(controlsLayout_1);
-
-
-    QLabel *currTimeLabel = new QLabel(controlsWidget_1);
-    playpauseButton *playpause = new playpauseButton(controlsWidget_1);
-    TimeSlider *timeSlider = new TimeSlider(controlsWidget_1);
-    timeSlider->setOrientation(Qt::Horizontal);
-
-
-
-    QSlider *volumeSlider = new QSlider(Qt::Vertical);
-    volumeSlider->setParent(controlsWidget_1);
-    volumeSlider->setMaximum(100);
-    volumeSlider->setMinimum(0);
-    volumeSlider->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
-
-    QComboBox *settingsComboBox = new QComboBox(controlsWidget_1);
-    settingsComboBox->addItem("Settings");
-    settingsComboBox->setItemIcon(0,QIcon(":/icons/gear_settings.png"));
-
-    settingsComboBox->addItem("Playback Speed");
-    settingsComboBox->addItem("FullScreen");
-    settingsComboBox->addItem("Quality");
-
-
-
-    controlsLayout_1->addWidget(playpause);
-    controlsLayout_1->addWidget(volumeSlider);
-    controlsLayout_1->addWidget(timeSlider);
-    controlsLayout_1->addWidget(currTimeLabel);
-    controlsLayout_1->addWidget(settingsComboBox);
-
-
-
-
-
-//second line of controls
-    QWidget *controlsWidget_2 = new QWidget();
-    QHBoxLayout *controlsLayout_2 = new QHBoxLayout();
-    controlsLayout_2->setSpacing(8);
-
-    controlsWidget_2->setLayout(controlsLayout_2);
-
-    ForwardButton *forwardButton = new ForwardButton(controlsWidget_2);
-    BackwardButton *backwardButton = new BackwardButton(controlsWidget_2);
-    RepeatButton *repeatOn = new RepeatButton(controlsWidget_2);
-    ShuffleButton *shuffleOn= new ShuffleButton(controlsWidget_2);
-
-    controlsLayout_2->addWidget(repeatOn,0);
-    controlsLayout_2->addWidget(shuffleOn,0);
-    controlsLayout_2->addWidget(backwardButton,0);
-    controlsLayout_2->addWidget(forwardButton,0);
-    controlsLayout_2->addWidget(repeatOn,0);
-
-
-
-
-
-
-//third line of controls
-    QWidget *infoWidgets = new QWidget();
-    QHBoxLayout *infoLayout = new QHBoxLayout();
-
-    infoWidgets->setLayout(infoLayout);
-
-    QLabel *title = new QLabel(infoWidgets);
-    infoLayout->addWidget(title);
-    QLabel *time = new QLabel(infoWidgets);
-    infoLayout->addWidget(time);
-
-
-    // add video, the buttons and controls to the top level widget
-    top->addWidget(videoWidget,0,0,10,1);
-    top->addWidget(controlsWidget_1,10,0,1,1);
-    top->addWidget(controlsWidget_2,11,0,1,1);
-    QLabel *buttonInstructions = new QLabel("Select a video to play");
-    top->addWidget(buttonInstructions,12,0,1,1);
-
-    top->addWidget(buttonWidget,13,0,1,1);
-    top->addWidget(infoWidgets,14,0,1,1);
-
-
-
-
-
-
-
-//volume and speed connections
-    QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
-
-//playpause button connection
-    QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
-
-//repeat shuffle connection
-    QObject::connect(repeatOn, SIGNAL(clicked()), player, SLOT(changeRepeat()));
-
-//time position of video connections
-    QObject::connect(player, SIGNAL( positionChanged(qint64)), timeSlider, SLOT(setValueqint(qint64)));
-    QObject::connect(timeSlider, SIGNAL(valueChanged(int)), player, SLOT(seek(int)));
-    QObject::connect(player, SIGNAL(timeS(int,int)), timeSlider, SLOT(setRange(int,int)));//changes range of slider to accomodate new video
-
-//next previous button connections
-    QObject::connect(forwardButton, SIGNAL(clicked()), player, SLOT(forward()));
-    QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
-//info label connections
-    QObject::connect(player, SIGNAL(namechange(QString)), title, SLOT(setText(QString)));
-    QObject::connect(player, SIGNAL(timeduration(QString)), currTimeLabel, SLOT(setText(QString)));
 
 
 
