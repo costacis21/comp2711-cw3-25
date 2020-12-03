@@ -9,7 +9,6 @@ public:
     bool state=true;//true for repeat On
      ShuffleButton(QWidget *parent) :  QPushButton(parent) {
          setIcon(QIcon(":/icons/shuffleOn.png"));
-//         QWidget::setFixedSize(QSize(50,50));
          setIconSize(QSize(50,50));
 
          connect(this,SIGNAL(clicked()),this,SLOT(repeatChanged()));
