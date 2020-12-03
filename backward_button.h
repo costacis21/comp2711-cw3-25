@@ -11,7 +11,8 @@ public:
 
      BackwardButton(QWidget *parent) :  QPushButton(parent) {
          setIcon(QIcon(":/icons/previous.png"));
-         QWidget::setFixedSize(QSize(50,50));
+         setIconSize(QSize(50,50));
+         setFlat(true);
      }
 
      void init();

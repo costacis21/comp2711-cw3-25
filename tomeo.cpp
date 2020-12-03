@@ -28,6 +28,10 @@
 #include <QtCore/QDirIterator>
 #include <QSlider>
 #include <QComboBox>
+#include <QTextEdit>
+#include <QScrollArea>
+#include <QToolBar>
+#include "my_videowidget.h"
 #include "the_player.h"
 #include "the_button.h"
 #include "play_pause.h"
@@ -37,8 +41,54 @@
 #include "shuffle_button.h"
 #include "time_slider.h"
 
+// a list of the buttons
+vector<TheButton*> buttons;
+vector<QString> buttonNames;
+vector<QString> buttonLocation;
+QString currentlyPlayingName;
+int currentlyPlayingIndex;
+QString currentlyPlayingLocation;
+QWidget *buttonsWidget;
+QVBoxLayout *buttonsLayout;
+QString searchParam;
+QString playbackComboBoxName;
+bool volumeVisible;
+QPushButton *volumeButton;
+QLabel *title;
+
 
 using namespace std;
+
+QString getNameFromURL(QUrl url){
+    QString currUrl= url.toString();
+    QStringList pieces = currUrl.split( "/" );
+    QString neededWord = pieces.value( pieces.length() - 1 );
+    pieces = neededWord.split( "." );
+    neededWord = pieces.value( pieces.length()-2 );
+    return neededWord;
+}
+
+void removeButtons(){
+
+    for(int i=0;i<buttonsLayout->count();i++){
+        if(searchParam.isEmpty()){
+            buttonsLayout->itemAt(i)->widget()->setVisible(true);
+            continue;
+        }
+        QString name;
+        name = getNameFromURL(*buttons.at(i)->info->url);
+        cout << name.toStdString()<<searchParam.toStdString()<< endl;
+
+        if(searchParam=="Austria"& name =="cycling"){
+            buttonsLayout->itemAt(i)->widget()->setVisible(true);
+        }else if(searchParam!=name){
+            buttonsLayout->itemAt(i)->widget()->setVisible(false);
+        }else{
+            buttonsLayout->itemAt(i)->widget()->setVisible(true);
+        }
+
+}
+}
 
 // read in videos and thumbnails to this directory
 vector<TheButtonInfo> getInfoIn (string loc) {
@@ -67,6 +117,12 @@ vector<TheButtonInfo> getInfoIn (string loc) {
                         QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
                         QUrl* url = new QUrl(QUrl::fromLocalFile( f )); // convert the file location to a generic url
                         out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
+                        QString currUrl= url->toString();
+                        QStringList pieces = currUrl.split( "/" );
+                        QString neededWord = pieces.value( pieces.length() - 1 );
+                        pieces = neededWord.split( "." );
+                        neededWord = pieces.value( pieces.length()-2 );
+                        buttonNames.push_back(neededWord);
                     }
                     else
                         qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;
@@ -115,39 +171,77 @@ int main(int argc, char *argv[]) {
     }
 
     // the widget that will show the video
-    QVideoWidget *videoWidget = new QVideoWidget;
+    MyVideoWidget *videoWidget = new MyVideoWidget();
 
     // the QMediaPlayer which controls the playback
     ThePlayer *player = new ThePlayer;
     player->setVideoOutput(videoWidget);
 
-    // a row of buttons
-    QWidget *buttonWidget = new QWidget();
-    // a list of the buttons
-    vector<TheButton*> buttons;
+
+
+    buttonsLayout = new QVBoxLayout();
+    buttonsWidget = new QWidget();
+    buttonsWidget->setLayout(buttonsLayout);
+
+
+
     // the buttons are arranged horizontally
-    QHBoxLayout *layout = new QHBoxLayout();
-    buttonWidget->setLayout(layout);
+
 
 
     // create the four buttons
-    for ( int i = 0; i < 4; i++ ) {
-        TheButton *button = new TheButton(buttonWidget);
-        button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo* ))); // when clicked, tell the player to play.
+    for ( int i = 0; i < videos.size()-1; i++ ) {
+        // a row of buttons
+        QWidget *buttonRowWidget = new QWidget(buttonsWidget);
+        QHBoxLayout *buttonRowLayout = new QHBoxLayout();
+        buttonRowWidget->setLayout(buttonRowLayout);
+
+        TheButton *button = new TheButton(buttonRowWidget);
+        QLabel *buttonLabel = new QLabel(buttonRowWidget);
+        QComboBox *queueCombo = new QComboBox(buttonRowWidget);
+        queueCombo->addItem("...");
+        queueCombo->addItem("Add to queue");
+        queueCombo->setFixedSize(QSize(40,30));
+        queueCombo->setStyleSheet("background-color: #e0e0e0;font:15pt;selection-color:black;");
+
+        QObject::connect(queueCombo, QOverload<int>::of(&QComboBox::activated),
+            [=](){ queueCombo->setCurrentIndex(0);});
+
+
+
+
+        button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo* )));
+
+        // when clicked, tell the player to play.
         buttons.push_back(button);
-        layout->addWidget(button);
+        if(buttonNames.at(i)!="cycling")
+            buttonLabel->setText(buttonNames.at(i)+"\n\nChina\n\n"+"03:02");
+        else
+            buttonLabel->setText(buttonNames.at(i)+"\n\nAustria\n\n"+"00:18");
+
+        buttonRowLayout->addWidget(button);
+        buttonRowLayout->addWidget(buttonLabel);
+        buttonRowLayout->addWidget(queueCombo,0,Qt::AlignRight);
+
+        buttonRowWidget->setFixedWidth(420);
+        buttonsLayout->addWidget(buttonRowWidget);
+
         button->init(&videos.at(i));
+
     }
+
 
     // tell the player what buttons and videos are available
     player->setContent(&buttons, & videos);
 
     // create the main window and layout
-    QWidget window;
+    QWidget *window= new QWidget();
+    window->setStyleSheet("background-color:#FFFFFF;");
+
     QGridLayout *top = new QGridLayout();
-    window.setLayout(top);
-    window.setWindowTitle("tomeo");
-    window.setMinimumSize(800, 680);
+    window->setLayout(top);
+    window->setWindowTitle("tomeo");
+    window->setMinimumSize(900, 680);
 
 //first line of controls
 
@@ -158,8 +252,14 @@ int main(int argc, char *argv[]) {
 
     controlsWidget_1->setLayout(controlsLayout_1);
 
+    volumeButton = new QPushButton();
+    volumeButton->setFlat(true);
+    volumeButton->setIcon(QIcon(":/icons/volume.png"));
+    volumeButton->setIconSize(QSize(30,30));
 
     QLabel *currTimeLabel = new QLabel(controlsWidget_1);
+    currTimeLabel->setStyleSheet("font:15pt;");
+
     playpauseButton *playpause = new playpauseButton(controlsWidget_1);
     TimeSlider *timeSlider = new TimeSlider(controlsWidget_1);
     timeSlider->setOrientation(Qt::Horizontal);
@@ -171,22 +271,30 @@ int main(int argc, char *argv[]) {
     volumeSlider->setMaximum(100);
     volumeSlider->setMinimum(0);
     volumeSlider->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
+    volumeSlider->setVisible(false);
 
-    QComboBox *settingsComboBox = new QComboBox(controlsWidget_1);
-    settingsComboBox->addItem("Settings");
-    settingsComboBox->setItemIcon(0,QIcon(":/icons/gear_settings.png"));
+    QComboBox *playbackComboBox = new QComboBox(controlsWidget_1);
+    playbackComboBox->setStyleSheet("font:15pt; selection-color:black;");
 
-    settingsComboBox->addItem("Playback Speed");
-    settingsComboBox->addItem("FullScreen");
-    settingsComboBox->addItem("Quality");
+    playbackComboBox->addItem("Playback Speed");
+    playbackComboBox->addItem("x0.5");
+    playbackComboBox->addItem("x1.0");
+    playbackComboBox->addItem("x1.5");
+    playbackComboBox->addItem("x2.0");
 
+    QPushButton *fullscreenButton = new QPushButton(controlsWidget_1);
+    fullscreenButton->setIcon(QIcon(":/icons/fullscreen.png"));
+    fullscreenButton->setFlat(true);
+    fullscreenButton->setIconSize(QSize(40,40));
 
 
     controlsLayout_1->addWidget(playpause);
+    controlsLayout_1->addWidget(volumeButton);
     controlsLayout_1->addWidget(volumeSlider);
     controlsLayout_1->addWidget(timeSlider);
     controlsLayout_1->addWidget(currTimeLabel);
-    controlsLayout_1->addWidget(settingsComboBox);
+    controlsLayout_1->addWidget(playbackComboBox);
+    controlsLayout_1->addWidget(fullscreenButton);
 
 
 
@@ -195,7 +303,6 @@ int main(int argc, char *argv[]) {
 //second line of controls
     QWidget *controlsWidget_2 = new QWidget();
     QHBoxLayout *controlsLayout_2 = new QHBoxLayout();
-    controlsLayout_2->setSpacing(8);
 
     controlsWidget_2->setLayout(controlsLayout_2);
 
@@ -204,11 +311,12 @@ int main(int argc, char *argv[]) {
     RepeatButton *repeatOn = new RepeatButton(controlsWidget_2);
     ShuffleButton *shuffleOn= new ShuffleButton(controlsWidget_2);
 
-    controlsLayout_2->addWidget(repeatOn,0);
-    controlsLayout_2->addWidget(shuffleOn,0);
-    controlsLayout_2->addWidget(backwardButton,0);
-    controlsLayout_2->addWidget(forwardButton,0);
-    controlsLayout_2->addWidget(repeatOn,0);
+
+    controlsLayout_2->addWidget(repeatOn,10);
+    controlsLayout_2->addWidget(shuffleOn,10);
+    controlsLayout_2->addWidget(backwardButton,10);
+    controlsLayout_2->addWidget(forwardButton,10);
+    controlsLayout_2->addWidget(repeatOn,10);
 
 
 
@@ -217,34 +325,115 @@ int main(int argc, char *argv[]) {
 
 //third line of controls
     QWidget *infoWidgets = new QWidget();
-    QHBoxLayout *infoLayout = new QHBoxLayout();
+    QVBoxLayout *infoLayout = new QVBoxLayout();
 
     infoWidgets->setLayout(infoLayout);
 
-    QLabel *title = new QLabel(infoWidgets);
+    QLabel *description = new QLabel(infoWidgets);
+    QObject::connect(player,&ThePlayer::mediaStatusChanged,[=](){
+        if (currentlyPlayingName=="cycling"){
+            description->setText("Austria\nThis is a video from austria while cycling in the mountains");
+        }else{
+            description->setText("China\nThis is a video with sound which was taken on a GOPRO");
+
+        }
+
+    });
+    title = new QLabel(infoWidgets);
+//    title->setText("Title");
+    title->setStyleSheet("font:20pt;font-weight:bold;");
+    description->setStyleSheet("font:15pt;");
     infoLayout->addWidget(title);
-    QLabel *time = new QLabel(infoWidgets);
-    infoLayout->addWidget(time);
+    infoLayout->addWidget(description);
+
+
+
+    QWidget *searchWidgets = new QWidget();
+    QHBoxLayout *searchLayout = new QHBoxLayout();
+    searchWidgets->setLayout(searchLayout);
+
+    QTextEdit *searchBox = new QTextEdit(searchWidgets);
+
+    QPushButton *searchButton = new QPushButton(searchWidgets);
+
+    QComboBox *sortingCombobox = new QComboBox(searchWidgets);
+    sortingCombobox->addItem("Sort");
+    sortingCombobox->addItem("Sort by date");
+    sortingCombobox->addItem("Sort by filename");
+    sortingCombobox->addItem("Sort by duration");
+    sortingCombobox->setStyleSheet("font:11pt; selection-color:black;");
+    searchBox->setFixedHeight(25);
+    searchBox->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    searchBox->setPlaceholderText("Search");
+    searchButton->setIcon(QIcon(":/icons/search.png"));
+    searchWidgets->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
+    searchBox->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
+
+
+    searchLayout->addWidget(searchButton);
+    searchLayout->addWidget(searchBox);
+    searchLayout->addWidget(sortingCombobox);
+
+    QScrollArea *scrollArea = new QScrollArea();
+
+
+    buttonsLayout->setAlignment(Qt::AlignTop);
+
+    scrollArea->setWidget(buttonsWidget);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    scrollArea->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
+
+
+    QWidget *menuWidget = new QWidget();
+
+
+
+    QToolBar *toolBar = new QToolBar(menuWidget);
+    QAction *help = new QAction();
+    help->setText("Help");
+    QMessageBox *helpBox = new QMessageBox();
+    helpBox->setText("For help please visit our site\n\nwww.tomeo.doesnotexist.tom");
+    helpBox->setStandardButtons(QMessageBox::Ok);
+    helpBox->setWindowTitle("Help");
+    toolBar->addAction(help);
+
+
+
+
+
+
 
 
     // add video, the buttons and controls to the top level widget
-    top->addWidget(videoWidget,0,0,10,1);
-    top->addWidget(controlsWidget_1,10,0,1,1);
-    top->addWidget(controlsWidget_2,11,0,1,1);
-    QLabel *buttonInstructions = new QLabel("Select a video to play");
-    top->addWidget(buttonInstructions,12,0,1,1);
+    top->addWidget(videoWidget,1,0,6,6);
 
-    top->addWidget(buttonWidget,13,0,1,1);
-    top->addWidget(infoWidgets,14,0,1,1);
+    top->addWidget(controlsWidget_1,7,0,1,6);
+
+    top->addWidget(searchWidgets,0,6,1,2);
+
+    top->addWidget(controlsWidget_2,7,6,1,2);
+
+    top->addWidget(scrollArea,1,6,6,2);
+    top->addWidget(infoWidgets,8,0,1,1);
+
+    top->addWidget(toolBar,0,0);
 
 
 
 
 
+    volumeVisible=false;
+    //show volume controll connection
 
+    QObject::connect(volumeButton, &QPushButton::clicked,
+                    [=]() { volumeVisible=!volumeVisible;volumeSlider->setVisible(volumeVisible); }
+                );
 
 //volume and speed connections
     QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
+    QObject::connect(playbackComboBox, QOverload<int>::of(&QComboBox::activated),
+        [=](int index){ if(!index){player->setPlaybackRate(1);}else{player->setPlaybackRate(0.5* index); }});
 
 //playpause button connection
     QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
@@ -260,16 +449,44 @@ int main(int argc, char *argv[]) {
 //next previous button connections
     QObject::connect(forwardButton, SIGNAL(clicked()), player, SLOT(forward()));
     QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
+
 //info label connections
-    QObject::connect(player, SIGNAL(namechange(QString)), title, SLOT(setText(QString)));
+//    QObject::connect(player, SIGNAL(namechange(QString)), title, SLOT(setText(QString)));
+    QObject::connect(player, &ThePlayer::mediaStatusChanged,
+        [=](){title->setText(getNameFromURL(player->currentMedia().canonicalUrl()));});
+    QObject::connect(player, &ThePlayer::mediaStatusChanged,
+        [=](){currentlyPlayingName=getNameFromURL(player->currentMedia().canonicalUrl());});
     QObject::connect(player, SIGNAL(timeduration(QString)), currTimeLabel, SLOT(setText(QString)));
+
+
+//search connections
+    QObject::connect(searchButton, &QPushButton::clicked, removeButtons);
+    QObject::connect(searchBox, &QTextEdit::textChanged, [&] {
+       searchParam=searchBox->toPlainText();
+    });
+    cout<<videoWidget->parentWidget()<<endl;
+
+//toolbar connections
+    QObject::connect(help, SIGNAL(hovered()), helpBox,SLOT(exec()));
+    QObject::connect(fullscreenButton,&QPushButton::clicked,[&]{
+        videoWidget->setFullScreen(true);
+    });
+    QObject::connect(videoWidget,&MyVideoWidget::fullScreenChanged,[&]{
+        if(!videoWidget->isFullScreen()){
+            videoWidget->setLayout(top);
+            videoWidget->setParent(window);
+            cout<<videoWidget->parentWidget()<<endl;
+    }});
+
 
 
 
 
     // showtime!
-    window.show();
+    window->show();
 
     // wait for the app to terminate
     return app.exec();
 }
+
+

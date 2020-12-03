@@ -26,3 +26,10 @@ void playpauseButton::changeplayStatus(){
 
 
 
+void playpauseButton::keyPressEvent(QKeyEvent* event){
+        if ( event->key() == Qt::Key_Space) {
+            playpauseclicked();
+            changeplayStatus();
+
+        }
+}

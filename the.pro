@@ -10,8 +10,10 @@ CONFIG += c++11
 SOURCES += \
         backward_button.cpp \
         forward_button.cpp \
+        my_videowidget.cpp \
         play_pause.cpp \
         repeat_button.cpp \
+        search_button.cpp \
         shuffle_button.cpp \
         the_button.cpp \
         the_player.cpp \
@@ -21,8 +23,10 @@ SOURCES += \
 HEADERS += \
     backward_button.h \
     forward_button.h \
+    my_videowidget.h \
     play_pause.h \
     repeat_button.h \
+    search_button.h \
     shuffle_button.h \
     the_button.h \
     the_player.h \

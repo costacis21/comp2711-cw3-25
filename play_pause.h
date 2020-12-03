@@ -1,6 +1,7 @@
 #ifndef PLAY_PAUSE_H
 #define PLAY_PAUSE_H
 
+#include <QKeyEvent>
 #include <QPushButton>
 #include <QIcon>
 #include "the_player.h"
@@ -17,9 +18,11 @@ public:
      playpauseButton(QWidget *parent) :  QPushButton(parent) {
          setIcon(QIcon(":/icons/pause.png"));
          setIconSize(QSize(50,50));
+         setFlat(true);
          connect(this, SIGNAL(clicked()), this, SLOT (playpauseclicked())); // if QPushButton clicked...then run playpauseclicked() below
 
      }
+     virtual void keyPressEvent(QKeyEvent* event) override;
 
      void init();
 

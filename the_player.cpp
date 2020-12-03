@@ -5,6 +5,7 @@
 #include "the_player.h"
 #include <stdio.h>
 
+
 using namespace std;
 
 // all buttons have been setup, store pointers here
@@ -23,6 +24,7 @@ void ThePlayer::shuffle() {
 }
 
 void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
+
     switch (ms) {
         case QMediaPlayer::State::StoppedState:
                 if(repeatOn){
@@ -45,7 +47,12 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
 
 void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
-    emit namechange(QString(button->url->toString()));
+    QString currUrl= button->url->toString();
+    QStringList pieces = currUrl.split( "/" );
+    QString neededWord = pieces.value( pieces.length() - 1 );
+    pieces = neededWord.split( "." );
+    neededWord = pieces.value( pieces.length()-2 );
+    emit namechange(neededWord);
     play();
 }
 
@@ -112,6 +119,9 @@ void ThePlayer::changeRepeat(){
 
 void ThePlayer::seek(int time){
     setPosition(qint64(time));
+
 }
+
+
 
 
