@@ -12,6 +12,7 @@ public:
          setIconSize(QSize(50,50));
          setFlat(true);
          connect(this,SIGNAL(clicked()),this,SLOT(repeatChanged()));
+         setFocusPolicy(Qt::NoFocus);
      }
 
      void init();

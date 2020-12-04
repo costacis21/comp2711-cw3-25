@@ -32,7 +32,7 @@ private slots:
      void playpauseclicked();
 
 signals:
-    inline void changeplayStatus();
+    void changeplayStatus();
 
 
 };

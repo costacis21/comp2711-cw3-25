@@ -16,6 +16,7 @@ public:
         setIcon(QIcon(":/icons/next.png"));
         setFlat(true);
         setIconSize(QSize(50,50));
+        setFocusPolicy(Qt::NoFocus);
 
      }
 

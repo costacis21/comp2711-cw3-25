@@ -9,8 +9,7 @@ class MyVideoWidget : public QVideoWidget {
 Q_OBJECT
     public:
         MyVideoWidget(QWidget* parent = nullptr) : QVideoWidget(parent) {
-            setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
+            setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
         }
 
 

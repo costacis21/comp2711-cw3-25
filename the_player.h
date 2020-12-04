@@ -11,6 +11,7 @@
 #include "the_button.h"
 #include <vector>
 #include <QTimer>
+#include <QMediaMetaData>
 
 using namespace std;
 
@@ -33,9 +34,11 @@ public:
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
         connect(this,SIGNAL(durationChanged(qint64)),this,SLOT( timedurationS(qint64 )));
-        mTimer = new QTimer(NULL);
-        mTimer->setInterval(1000); // 1000ms is one second between ...
-        mTimer->start();
+
+//        mTimer = new QTimer(NULL);
+//        mTimer->setInterval(1000); // 1000ms is one second between ...
+//        mTimer->start();
+
 //        connect( mTimer, SIGNAL (timeout()), SLOT ( shuffle() ) ); // ...running shuffle method
 
     }

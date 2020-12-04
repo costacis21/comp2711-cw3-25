@@ -34,6 +34,7 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
                 else if(shuffleOn){
                     setMedia(*buttons -> at( updateCount++ % buttons->size())->info->url);
                     play();
+
                 }else
                     stop();
 
@@ -47,12 +48,8 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
 
 void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
-    QString currUrl= button->url->toString();
-    QStringList pieces = currUrl.split( "/" );
-    QString neededWord = pieces.value( pieces.length() - 1 );
-    pieces = neededWord.split( "." );
-    neededWord = pieces.value( pieces.length()-2 );
-    emit namechange(neededWord);
+
+    emit namechange(button->getNameFromURL());
     play();
 }
 

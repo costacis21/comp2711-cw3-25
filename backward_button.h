@@ -13,6 +13,8 @@ public:
          setIcon(QIcon(":/icons/previous.png"));
          setIconSize(QSize(50,50));
          setFlat(true);
+         setFocusPolicy(Qt::NoFocus);
+
      }
 
      void init();

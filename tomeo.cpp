@@ -31,6 +31,7 @@
 #include <QTextEdit>
 #include <QScrollArea>
 #include <QToolBar>
+#include <QMediaMetaData>
 #include "my_videowidget.h"
 #include "the_player.h"
 #include "the_button.h"
@@ -437,6 +438,8 @@ int main(int argc, char *argv[]) {
 
 //playpause button connection
     QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
+    QObject::connect(playpause, SIGNAL(changeplayStatus()),player,SLOT(changePlayPause()));
+
 
 //repeat shuffle connection
     QObject::connect(repeatOn, SIGNAL(clicked()), player, SLOT(changeRepeat()));
@@ -451,7 +454,6 @@ int main(int argc, char *argv[]) {
     QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
 
 //info label connections
-//    QObject::connect(player, SIGNAL(namechange(QString)), title, SLOT(setText(QString)));
     QObject::connect(player, &ThePlayer::mediaStatusChanged,
         [=](){title->setText(getNameFromURL(player->currentMedia().canonicalUrl()));});
     QObject::connect(player, &ThePlayer::mediaStatusChanged,
@@ -466,17 +468,11 @@ int main(int argc, char *argv[]) {
     });
     cout<<videoWidget->parentWidget()<<endl;
 
-//toolbar connections
+//toolbar nad full screen connections
     QObject::connect(help, SIGNAL(hovered()), helpBox,SLOT(exec()));
     QObject::connect(fullscreenButton,&QPushButton::clicked,[&]{
         videoWidget->setFullScreen(true);
     });
-    QObject::connect(videoWidget,&MyVideoWidget::fullScreenChanged,[&]{
-        if(!videoWidget->isFullScreen()){
-            videoWidget->setLayout(top);
-            videoWidget->setParent(window);
-            cout<<videoWidget->parentWidget()<<endl;
-    }});
 
 
 
