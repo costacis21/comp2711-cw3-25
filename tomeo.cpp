@@ -42,7 +42,6 @@
 #include "shuffle_button.h"
 #include "time_slider.h"
 
-// a list of the buttons
 vector<TheButton*> buttons;
 vector<QString> buttonNames;
 vector<QString> buttonLocation;
@@ -56,15 +55,28 @@ QString playbackComboBoxName;
 bool volumeVisible;
 QPushButton *volumeButton;
 QLabel *title;
-
+vector<TheButtonInfo> videos;
+MyVideoWidget *videoWidget;
+ThePlayer *player;
+QWidget *window;
+QGridLayout *top;
+QWidget *controlsWidget_1;
+QHBoxLayout *controlsLayout_1;
+QWidget *controlsWidget_2;
+QHBoxLayout *controlsLayout_2;
+QWidget *searchWidgets;
+QScrollArea *scrollArea;
+QWidget *infoWidgets ;
+QWidget *menuWidget;
+QToolBar *toolBar;
+QSlider *volumeSlider;
+QComboBox *playbackComboBox;
+playpauseButton *playpause;
+TimeSlider *timeSlider;
+QLabel *currTimeLabel;
+QPushButton *fullscreenButton;
 
 using namespace std;
-
-class Tomeo{
-    Tomeo(){
-
-    }
-};
 
 QString getNameFromURL(QUrl url){
     QString currUrl= url.toString();
@@ -144,60 +156,15 @@ vector<TheButtonInfo> getInfoIn (string loc) {
 }
 
 
-int main(int argc, char *argv[]) {
-
-    // let's just check that Qt is operational first
-    qDebug() << "Qt version: " << QT_VERSION_STR << endl;
-
-    // create the Qt Application
-    QApplication app(argc, argv);
-
-    // collect all the videos in the folder
-    vector<TheButtonInfo> videos;
-
-    if (argc == 2)
-        videos = getInfoIn( string(argv[1]) );
-
-    if (videos.size() == 0) {
-
-        const int result = QMessageBox::question(
-                    NULL,
-                    QString("Tomeo"),
-                    QString("no videos found! download, unzip, and add command line argument to \"quoted\" file location. Download videos from Tom's OneDrive?"),
-                    QMessageBox::Yes |
-                    QMessageBox::No );
-
-        switch( result )
-        {
-        case QMessageBox::Yes:
-          QDesktopServices::openUrl(QUrl("https://leeds365-my.sharepoint.com/:u:/g/personal/scstke_leeds_ac_uk/EcGntcL-K3JOiaZF4T_uaA4BHn6USbq2E55kF_BTfdpPag?e=n1qfuN"));
-          break;
-        default:
-            break;
-        }
-        exit(-1);
-    }
-
-    // the widget that will show the video
-    MyVideoWidget *videoWidget = new MyVideoWidget();
-
-    // the QMediaPlayer which controls the playback
-    ThePlayer *player = new ThePlayer;
-    player->setVideoOutput(videoWidget);
 
 
 
+void createButtons(){
+    // create the four buttons
     buttonsLayout = new QVBoxLayout();
     buttonsWidget = new QWidget();
     buttonsWidget->setLayout(buttonsLayout);
 
-
-
-    // the buttons are arranged horizontally
-
-
-
-    // create the four buttons
     for ( int i = 0; i < videos.size()-1; i++ ) {
         // a row of buttons
         QWidget *buttonRowWidget = new QWidget(buttonsWidget);
@@ -212,6 +179,7 @@ int main(int argc, char *argv[]) {
         buttonLabel_description->setStyleSheet("font: 12pt;font-weight:100;");
         buttonLabel_description->setWordWrap(true);
         buttonLabel_duration->setStyleSheet("font: 12pt;font-weight:100;");
+
 
 
         QComboBox *queueCombo = new QComboBox(/*buttonRowWidget*/);
@@ -237,7 +205,8 @@ int main(int argc, char *argv[]) {
         }
         else{
             buttonLabel_title->setText(buttonNames.at(i));
-            buttonLabel_description->setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore");
+            buttonLabel_description->setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit,\
+                                             sed do eiusmod tempor incididunt ut labore");
             buttonLabel_duration->setText("0:10");
         }
         buttonRowLayout->addWidget(button,0,0,5,5);
@@ -253,23 +222,51 @@ int main(int argc, char *argv[]) {
 
     }
 
+}
 
-    // tell the player what buttons and videos are available
-    player->setContent(&buttons, & videos);
 
-    // create the main window and layout
-    QWidget *window= new QWidget();
-    window->setStyleSheet("background-color:#FFFFFF;");
 
-    QGridLayout *top = new QGridLayout();
-    window->setLayout(top);
-    window->setWindowTitle("tomeo");
-    window->setMinimumSize(900, 680);
+void createConnections_controls_1(){
 
-//first line of controls
+    QObject::connect(volumeButton, &QPushButton::clicked,
+                    [=]() { volumeVisible=!volumeVisible;volumeSlider->setVisible(volumeVisible); }
+                );
 
-    QWidget *controlsWidget_1 = new QWidget();
-    QHBoxLayout *controlsLayout_1 = new QHBoxLayout();
+//volume and speed connections
+    QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
+    QObject::connect(playbackComboBox, QOverload<int>::of(&QComboBox::activated),
+        [=](int index){ if(!index){player->setPlaybackRate(1);}else{player->setPlaybackRate(0.5* index); }});
+
+
+//playpause button connection
+    QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
+    QObject::connect(playpause, SIGNAL(changeplayStatus()),player,SLOT(changePlayPause()));
+    QObject::connect(videoWidget,SIGNAL(pauseChanged()),player, SLOT(changePlayPause()));
+    QObject::connect(videoWidget,SIGNAL(pauseChanged()),playpause, SLOT(playpauseclicked()));
+
+
+//time position of video connections
+    QObject::connect(player, SIGNAL( positionChanged(qint64)), timeSlider, SLOT(setValueqint(qint64)));
+    QObject::connect(timeSlider, SIGNAL(valueChanged(int)), player, SLOT(seek(int)));
+    QObject::connect(player, SIGNAL(timeduration(QString)), currTimeLabel, SLOT(setText(QString)));
+
+
+    QObject::connect(player, SIGNAL(timeS(int,int)), timeSlider, SLOT(setRange(int,int)));
+//changes range of slider to accomodate new video
+
+    QObject::connect(fullscreenButton,&QPushButton::clicked,[&]{
+        videoWidget->setFullScreen(true);
+    });
+}
+
+
+
+void createControls_1(){
+    //first line of controls
+    volumeVisible=false;
+
+    controlsWidget_1 = new QWidget();
+    controlsLayout_1 = new QHBoxLayout();
 
 
 
@@ -280,23 +277,23 @@ int main(int argc, char *argv[]) {
     volumeButton->setIcon(QIcon(":/icons/volume.png"));
     volumeButton->setIconSize(QSize(30,30));
 
-    QLabel *currTimeLabel = new QLabel(controlsWidget_1);
+    currTimeLabel = new QLabel(controlsWidget_1);
     currTimeLabel->setStyleSheet("font:15pt;");
 
-    playpauseButton *playpause = new playpauseButton(controlsWidget_1);
-    TimeSlider *timeSlider = new TimeSlider(controlsWidget_1);
+    playpause = new playpauseButton(controlsWidget_1);
+    timeSlider = new TimeSlider(controlsWidget_1);
     timeSlider->setOrientation(Qt::Horizontal);
 
 
 
-    QSlider *volumeSlider = new QSlider(Qt::Vertical);
+    volumeSlider = new QSlider(Qt::Vertical);
     volumeSlider->setParent(controlsWidget_1);
     volumeSlider->setMaximum(100);
     volumeSlider->setMinimum(0);
     volumeSlider->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
     volumeSlider->setVisible(false);
 
-    QComboBox *playbackComboBox = new QComboBox(controlsWidget_1);
+    playbackComboBox = new QComboBox(controlsWidget_1);
     playbackComboBox->setStyleSheet("font:15pt; selection-color:black;");
 
     playbackComboBox->addItem("Playback Speed");
@@ -305,7 +302,7 @@ int main(int argc, char *argv[]) {
     playbackComboBox->addItem("x1.5");
     playbackComboBox->addItem("x2.0");
 
-    QPushButton *fullscreenButton = new QPushButton(controlsWidget_1);
+    fullscreenButton = new QPushButton(controlsWidget_1);
     fullscreenButton->setIcon(QIcon(":/icons/fullscreen.png"));
     fullscreenButton->setFlat(true);
     fullscreenButton->setIconSize(QSize(40,40));
@@ -321,13 +318,17 @@ int main(int argc, char *argv[]) {
     controlsLayout_1->addWidget(playbackComboBox);
     controlsLayout_1->addWidget(fullscreenButton);
 
+    createConnections_controls_1();
+}
 
 
 
 
-//second line of controls
-    QWidget *controlsWidget_2 = new QWidget();
-    QHBoxLayout *controlsLayout_2 = new QHBoxLayout();
+
+
+void createControls_2(){//second line of controls
+    controlsWidget_2 = new QWidget();
+    controlsLayout_2 = new QHBoxLayout();
 
     controlsWidget_2->setLayout(controlsLayout_2);
 
@@ -343,13 +344,19 @@ int main(int argc, char *argv[]) {
     controlsLayout_2->addWidget(forwardButton,10);
     controlsLayout_2->addWidget(repeatOn,10);
 
+    //repeat shuffle connection
+        QObject::connect(repeatOn, SIGNAL(clicked()), player, SLOT(changeRepeat()));
+    //next previous button connections
+        QObject::connect(forwardButton, SIGNAL(clicked()), player, SLOT(forward()));
+        QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
+}
 
 
 
 
 
-//third line of controls
-    QWidget *infoWidgets = new QWidget();
+void createInfos(){//third line of controls
+    infoWidgets = new QWidget();
     QVBoxLayout *infoLayout = new QVBoxLayout();
 
     infoWidgets->setLayout(infoLayout);
@@ -365,15 +372,24 @@ int main(int argc, char *argv[]) {
 
     });
     title = new QLabel(infoWidgets);
-//    title->setText("Title");
     title->setStyleSheet("font:20pt;font-weight:bold;");
     description->setStyleSheet("font:15pt;");
     infoLayout->addWidget(title);
     infoLayout->addWidget(description);
 
+    //info label connections
+        QObject::connect(player, &ThePlayer::mediaStatusChanged,
+            [=](){title->setText(getNameFromURL(player->currentMedia().canonicalUrl()));});
+        QObject::connect(player, &ThePlayer::mediaStatusChanged,
+            [=](){currentlyPlayingName=getNameFromURL(player->currentMedia().canonicalUrl());});
+
+}
 
 
-    QWidget *searchWidgets = new QWidget();
+
+
+void createSearch(){
+    searchWidgets = new QWidget();
     QHBoxLayout *searchLayout = new QHBoxLayout();
     searchWidgets->setLayout(searchLayout);
 
@@ -399,7 +415,15 @@ int main(int argc, char *argv[]) {
     searchLayout->addWidget(searchBox);
     searchLayout->addWidget(sortingCombobox);
 
-    QScrollArea *scrollArea = new QScrollArea();
+    //search connections
+        QObject::connect(searchButton, &QPushButton::clicked, removeButtons);
+        QObject::connect(searchBox, &QTextEdit::textChanged, [&] {
+           searchParam=searchBox->toPlainText();
+        });
+}
+
+void createScroll(){
+    scrollArea = new QScrollArea();
 
 
     buttonsLayout->setAlignment(Qt::AlignTop);
@@ -408,12 +432,16 @@ int main(int argc, char *argv[]) {
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     scrollArea->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
+}
 
 
-    QWidget *menuWidget = new QWidget();
 
 
-    QToolBar *toolBar = new QToolBar(menuWidget);
+void createToolBar(){
+    menuWidget = new QWidget();
+
+
+    toolBar = new QToolBar(menuWidget);
     QAction *help = new QAction();
     help->setText("Help");
     QMessageBox *helpBox = new QMessageBox();
@@ -421,11 +449,70 @@ int main(int argc, char *argv[]) {
     helpBox->setStandardButtons(QMessageBox::Ok);
     helpBox->setWindowTitle("Help");
     toolBar->addAction(help);
+    QObject::connect(help, SIGNAL(hovered()), helpBox,SLOT(exec()));
+
+}
 
 
 
 
 
+
+
+
+
+int main(int argc, char *argv[]) {
+
+    // let's just check that Qt is operational first
+    qDebug() << "Qt version: " << QT_VERSION_STR << endl;
+
+    // create the Qt Application
+    QApplication app(argc, argv);
+
+    // collect all the videos in the folder
+
+
+    if (argc == 2)
+        videos = getInfoIn( string(argv[1]) );
+
+    if (videos.size() == 0) {
+
+        QMessageBox *alert = new QMessageBox();
+        alert->setText("No videos in arguments");
+        alert->exec();
+        exit(-1);
+    }
+
+    // the widget that will show the video
+    videoWidget = new MyVideoWidget();
+
+    // the QMediaPlayer which controls the playback
+    player = new ThePlayer;
+    createButtons();
+
+    player->setVideoOutput(videoWidget);
+
+
+
+
+    // tell the player what buttons and videos are available
+    player->setContent(&buttons, & videos);
+
+    // create the main window and layout
+    window= new QWidget();
+    window->setStyleSheet("background-color:#FFFFFF;");
+
+    top = new QGridLayout();
+    window->setLayout(top);
+    window->setWindowTitle("tomeo");
+    window->setMinimumSize(900, 680);
+
+    createControls_1();
+    createControls_2();
+    createInfos();
+    createScroll();
+    createSearch();
+    createToolBar();
 
 
 
@@ -444,64 +531,6 @@ int main(int argc, char *argv[]) {
     top->addWidget(toolBar,0,0);
 
 
-
-
-
-    volumeVisible=false;
-    //show volume controll connection
-
-    QObject::connect(volumeButton, &QPushButton::clicked,
-                    [=]() { volumeVisible=!volumeVisible;volumeSlider->setVisible(volumeVisible); }
-                );
-
-//volume and speed connections
-    QObject::connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
-    QObject::connect(playbackComboBox, QOverload<int>::of(&QComboBox::activated),
-        [=](int index){ if(!index){player->setPlaybackRate(1);}else{player->setPlaybackRate(0.5* index); }});
-
-//playpause button connection
-    QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
-    QObject::connect(playpause, SIGNAL(changeplayStatus()),player,SLOT(changePlayPause()));
-    QObject::connect(videoWidget,SIGNAL(pauseChanged()),player, SLOT(changePlayPause()));
-    QObject::connect(videoWidget,SIGNAL(pauseChanged()),playpause, SLOT(playpauseclicked()));
-
-//repeat shuffle connection
-    QObject::connect(repeatOn, SIGNAL(clicked()), player, SLOT(changeRepeat()));
-
-//time position of video connections
-    QObject::connect(player, SIGNAL( positionChanged(qint64)), timeSlider, SLOT(setValueqint(qint64)));
-    QObject::connect(timeSlider, SIGNAL(valueChanged(int)), player, SLOT(seek(int)));
-    QObject::connect(player, SIGNAL(timeS(int,int)), timeSlider, SLOT(setRange(int,int)));//changes range of slider to accomodate new video
-
-//next previous button connections
-    QObject::connect(forwardButton, SIGNAL(clicked()), player, SLOT(forward()));
-    QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
-
-//info label connections
-    QObject::connect(player, &ThePlayer::mediaStatusChanged,
-        [=](){title->setText(getNameFromURL(player->currentMedia().canonicalUrl()));});
-    QObject::connect(player, &ThePlayer::mediaStatusChanged,
-        [=](){currentlyPlayingName=getNameFromURL(player->currentMedia().canonicalUrl());});
-    QObject::connect(player, SIGNAL(timeduration(QString)), currTimeLabel, SLOT(setText(QString)));
-
-
-//search connections
-    QObject::connect(searchButton, &QPushButton::clicked, removeButtons);
-    QObject::connect(searchBox, &QTextEdit::textChanged, [&] {
-       searchParam=searchBox->toPlainText();
-    });
-    cout<<videoWidget->parentWidget()<<endl;
-
-//toolbar nad full screen connections
-    QObject::connect(help, SIGNAL(hovered()), helpBox,SLOT(exec()));
-    QObject::connect(fullscreenButton,&QPushButton::clicked,[&]{
-        videoWidget->setFullScreen(true);
-    });
-
-
-
-
-    cout<<buttons.at(1)->info->duration.toStdString()<<endl;
 
 
     // showtime!
