@@ -49,7 +49,7 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
 void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
 
-    emit namechange(button->getNameFromURL());
+    emit namechange(button->name);
     play();
 }
 

@@ -8,9 +8,12 @@ void MyVideoWidget::keyPressEvent(QKeyEvent *event)
     } else if (event->key() == Qt::Key_Enter && event->modifiers() & Qt::Key_Alt) {
         setFullScreen(!isFullScreen());
         event->accept();
-    } else {
+    } else if (event->key() == Qt::Key_Space){
+        emit pauseChanged();
+    }else {
         QVideoWidget::keyPressEvent(event);
     }
+
 }
 
 void MyVideoWidget::mouseDoubleClickEvent(QMouseEvent *event)

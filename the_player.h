@@ -35,12 +35,6 @@ public:
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
         connect(this,SIGNAL(durationChanged(qint64)),this,SLOT( timedurationS(qint64 )));
 
-//        mTimer = new QTimer(NULL);
-//        mTimer->setInterval(1000); // 1000ms is one second between ...
-//        mTimer->start();
-
-//        connect( mTimer, SIGNAL (timeout()), SLOT ( shuffle() ) ); // ...running shuffle method
-
     }
 
     // all buttons have been setup, store pointers here

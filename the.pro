@@ -30,7 +30,8 @@ HEADERS += \
     shuffle_button.h \
     the_button.h \
     the_player.h \
-    time_slider.h
+    time_slider.h \
+    tomeo.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

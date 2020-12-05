@@ -24,13 +24,17 @@ public:
     QString location;
     QString duration;
 
-    TheButtonInfo ( QUrl* url, QIcon* icon) : url (url), icon (icon),name(getNameFromURL()) {
+    TheButtonInfo ( QUrl* url, QIcon* icon) : url (url), icon (icon) {
+        name=getName();
 
+}
 
+private:
+    QString miliToFormated(qint64 time);
+    QString getName();
+    QString getLocation();
+    QString getDuration();
 
-    }
-    QString getNameFromURL();
-    QString getLocationFromUrl();
 };
 
 class TheButton : public QPushButton {
@@ -40,7 +44,7 @@ public:
     TheButtonInfo* info;
 
      TheButton(QWidget *parent) :  QPushButton(parent) {
-         setIconSize(QSize(200,110));
+         setIconSize(QSize(250,160));
          connect(this, SIGNAL(released()), this, SLOT (clicked())); // if QPushButton clicked...then run clicked() below
          setFocusPolicy(Qt::NoFocus);
     }

@@ -60,6 +60,12 @@ QLabel *title;
 
 using namespace std;
 
+class Tomeo{
+    Tomeo(){
+
+    }
+};
+
 QString getNameFromURL(QUrl url){
     QString currUrl= url.toString();
     QStringList pieces = currUrl.split( "/" );
@@ -124,6 +130,7 @@ vector<TheButtonInfo> getInfoIn (string loc) {
                         pieces = neededWord.split( "." );
                         neededWord = pieces.value( pieces.length()-2 );
                         buttonNames.push_back(neededWord);
+
                     }
                     else
                         qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;
@@ -194,12 +201,20 @@ int main(int argc, char *argv[]) {
     for ( int i = 0; i < videos.size()-1; i++ ) {
         // a row of buttons
         QWidget *buttonRowWidget = new QWidget(buttonsWidget);
-        QHBoxLayout *buttonRowLayout = new QHBoxLayout();
+        QGridLayout *buttonRowLayout = new QGridLayout();
         buttonRowWidget->setLayout(buttonRowLayout);
 
         TheButton *button = new TheButton(buttonRowWidget);
-        QLabel *buttonLabel = new QLabel(buttonRowWidget);
-        QComboBox *queueCombo = new QComboBox(buttonRowWidget);
+        QLabel *buttonLabel_title = new QLabel(buttonRowWidget);
+        QLabel *buttonLabel_description = new QLabel(buttonRowWidget);
+        QLabel *buttonLabel_duration = new QLabel(buttonRowWidget);
+        buttonLabel_title->setStyleSheet("font: 14pt;font-weight:bold;");
+        buttonLabel_description->setStyleSheet("font: 12pt;font-weight:100;");
+        buttonLabel_description->setWordWrap(true);
+        buttonLabel_duration->setStyleSheet("font: 12pt;font-weight:100;");
+
+
+        QComboBox *queueCombo = new QComboBox(/*buttonRowWidget*/);
         queueCombo->addItem("...");
         queueCombo->addItem("Add to queue");
         queueCombo->setFixedSize(QSize(40,30));
@@ -212,17 +227,24 @@ int main(int argc, char *argv[]) {
 
 
         button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo* )));
-
         // when clicked, tell the player to play.
         buttons.push_back(button);
-        if(buttonNames.at(i)!="cycling")
-            buttonLabel->setText(buttonNames.at(i)+"\n\nChina\n\n"+"03:02");
-        else
-            buttonLabel->setText(buttonNames.at(i)+"\n\nAustria\n\n"+"00:18");
+        if(buttonNames.at(i)=="cycling"){
+            buttonLabel_title->setText(buttonNames.at(i));
+            buttonLabel_description->setText("Video cycling in Austria");
+            buttonLabel_duration->setText("0:18");
 
-        buttonRowLayout->addWidget(button);
-        buttonRowLayout->addWidget(buttonLabel);
-        buttonRowLayout->addWidget(queueCombo,0,Qt::AlignRight);
+        }
+        else{
+            buttonLabel_title->setText(buttonNames.at(i));
+            buttonLabel_description->setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore");
+            buttonLabel_duration->setText("0:10");
+        }
+        buttonRowLayout->addWidget(button,0,0,5,5);
+        buttonRowLayout->addWidget(buttonLabel_title,0,5,1,1);
+        buttonRowLayout->addWidget(buttonLabel_description,1,5,2,1);
+        buttonRowLayout->addWidget(buttonLabel_duration,3,5,1,1);
+
 
         buttonRowWidget->setFixedWidth(420);
         buttonsLayout->addWidget(buttonRowWidget);
@@ -287,6 +309,8 @@ int main(int argc, char *argv[]) {
     fullscreenButton->setIcon(QIcon(":/icons/fullscreen.png"));
     fullscreenButton->setFlat(true);
     fullscreenButton->setIconSize(QSize(40,40));
+    fullscreenButton->setFocusPolicy(Qt::NoFocus);
+
 
 
     controlsLayout_1->addWidget(playpause);
@@ -365,7 +389,7 @@ int main(int argc, char *argv[]) {
     sortingCombobox->setStyleSheet("font:11pt; selection-color:black;");
     searchBox->setFixedHeight(25);
     searchBox->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    searchBox->setPlaceholderText("Search");
+    searchBox->setPlaceholderText("Search by name, location");
     searchButton->setIcon(QIcon(":/icons/search.png"));
     searchWidgets->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
     searchBox->setSizePolicy(QSizePolicy ::Minimum , QSizePolicy ::Minimum);
@@ -387,7 +411,6 @@ int main(int argc, char *argv[]) {
 
 
     QWidget *menuWidget = new QWidget();
-
 
 
     QToolBar *toolBar = new QToolBar(menuWidget);
@@ -439,7 +462,8 @@ int main(int argc, char *argv[]) {
 //playpause button connection
     QObject::connect(playpause, SIGNAL(clicked()), player, SLOT(changePlayPause()));
     QObject::connect(playpause, SIGNAL(changeplayStatus()),player,SLOT(changePlayPause()));
-
+    QObject::connect(videoWidget,SIGNAL(pauseChanged()),player, SLOT(changePlayPause()));
+    QObject::connect(videoWidget,SIGNAL(pauseChanged()),playpause, SLOT(playpauseclicked()));
 
 //repeat shuffle connection
     QObject::connect(repeatOn, SIGNAL(clicked()), player, SLOT(changeRepeat()));
@@ -476,6 +500,8 @@ int main(int argc, char *argv[]) {
 
 
 
+
+    cout<<buttons.at(1)->info->duration.toStdString()<<endl;
 
 
     // showtime!

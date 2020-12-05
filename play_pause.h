@@ -21,6 +21,7 @@ public:
          setFlat(true);
          connect(this, SIGNAL(clicked()), this, SLOT (playpauseclicked())); // if QPushButton clicked...then run playpauseclicked() below
 
+
      }
      virtual void keyPressEvent(QKeyEvent* event) override;
 
