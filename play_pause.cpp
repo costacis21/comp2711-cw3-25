@@ -7,7 +7,7 @@
 //true for play
 
 
-void playpauseButton::playpauseclicked() {
+void PlaypauseButton::playpauseclicked() {
 
     if (state){
         this->setIcon(QIcon(":/icons/pause.png"));
@@ -24,7 +24,7 @@ void playpauseButton::playpauseclicked() {
 
 
 
-void playpauseButton::keyPressEvent(QKeyEvent* event){
+void PlaypauseButton::keyPressEvent(QKeyEvent* event){
         if ( event->key() == Qt::Key_Space) {
             playpauseclicked();
             emit changeplayStatus();

@@ -42,6 +42,8 @@
 #include "shuffle_button.h"
 #include "time_slider.h"
 
+
+
 vector<TheButton*> buttons;
 vector<QString> buttonNames;
 vector<QString> buttonLocation;
@@ -71,7 +73,7 @@ QWidget *menuWidget;
 QToolBar *toolBar;
 QSlider *volumeSlider;
 QComboBox *playbackComboBox;
-playpauseButton *playpause;
+PlaypauseButton *playpause;
 TimeSlider *timeSlider;
 QLabel *currTimeLabel;
 QPushButton *fullscreenButton;
@@ -280,7 +282,7 @@ void createControls_1(){
     currTimeLabel = new QLabel(controlsWidget_1);
     currTimeLabel->setStyleSheet("font:15pt;");
 
-    playpause = new playpauseButton(controlsWidget_1);
+    playpause = new PlaypauseButton(controlsWidget_1);
     timeSlider = new TimeSlider(controlsWidget_1);
     timeSlider->setOrientation(Qt::Horizontal);
 

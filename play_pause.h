@@ -9,13 +9,13 @@
 
 
 
-class playpauseButton : public QPushButton {
+class PlaypauseButton : public QPushButton {
     Q_OBJECT
     bool state=false;//true for play
 
 public:
 
-     playpauseButton(QWidget *parent) :  QPushButton(parent) {
+     PlaypauseButton(QWidget *parent) :  QPushButton(parent) {
          setIcon(QIcon(":/icons/pause.png"));
          setIconSize(QSize(50,50));
          setFlat(true);
