@@ -20,7 +20,7 @@ public:
          setIconSize(QSize(50,50));
          setFlat(true);
          connect(this, SIGNAL(clicked()), this, SLOT (playpauseclicked())); // if QPushButton clicked...then run playpauseclicked() below
-
+         setCursor(QCursor(Qt::PointingHandCursor));
 
      }
      virtual void keyPressEvent(QKeyEvent* event) override;

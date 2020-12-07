@@ -51,6 +51,8 @@ void ThePlayer::jumpTo (TheButtonInfo* button) {
 
     emit namechange(button->name);
     play();
+
+
 }
 
 void ThePlayer::setVolumeSlot(int vol){
@@ -70,19 +72,19 @@ void ThePlayer::changePlayPause(){
 }
 
 void ThePlayer::forward(){
-    currVid++;
+    currVidIndex++;
 
-    if(currVid>buttons->size()-1)
-        currVid=0;
-    jumpTo(buttons->at(currVid)->info);
+    if(currVidIndex>buttons->size()-1)
+        currVidIndex=0;
+    jumpTo(buttons->at(currVidIndex)->info);
 }
 
 void ThePlayer::backwards(){
-    currVid--;
+    currVidIndex--;
 
-    if(currVid<0)
-        currVid=buttons->size()-1;
-    jumpTo(buttons->at(currVid)->info);
+    if(currVidIndex<0)
+        currVidIndex=buttons->size()-1;
+    jumpTo(buttons->at(currVidIndex)->info);
 }
 
 void ThePlayer::timedurationS(qint64 time){

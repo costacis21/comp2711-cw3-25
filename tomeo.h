@@ -23,6 +23,7 @@
 #include <QScrollArea>
 #include <QToolBar>
 #include <QMediaMetaData>
+#include <QFileDialog>
 #include "my_videowidget.h"
 #include "the_player.h"
 #include "the_button.h"

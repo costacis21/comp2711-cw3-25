@@ -24,7 +24,8 @@ private:
     vector<TheButton*>* buttons;
     QTimer* mTimer;
     long updateCount = 0;
-    int currVid=0;
+    int currVidIndex=0;
+    TheButtonInfo *currVid;
 
 public:
     bool playstatus=true;//true for play
@@ -34,6 +35,7 @@ public:
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
         connect(this,SIGNAL(durationChanged(qint64)),this,SLOT( timedurationS(qint64 )));
+
 
     }
 

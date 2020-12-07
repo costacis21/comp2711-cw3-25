@@ -412,7 +412,7 @@ int Tomeo::show(){
 
         QMessageBox *alert = new QMessageBox();
         alert->setText("No videos in arguments");
-        alert->exec();
+            alert->exec();
         exit(-1);
     }
 
