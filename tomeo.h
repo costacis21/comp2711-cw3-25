@@ -24,6 +24,7 @@
 #include <QToolBar>
 #include <QMediaMetaData>
 #include <QFileDialog>
+#include <QMenuBar>
 #include "my_videowidget.h"
 #include "the_player.h"
 #include "the_button.h"
@@ -33,6 +34,7 @@
 #include "repeat_button.h"
 #include "shuffle_button.h"
 #include "time_slider.h"
+#include "library.h"
 
 class Tomeo {
 
@@ -40,6 +42,7 @@ class Tomeo {
 
 public:
     vector<TheButton*> buttons;
+    vector<Library*> libraries;
     vector<QString> buttonNames;
     vector<QString> buttonLocation;
     QString currentlyPlayingName;
@@ -65,13 +68,18 @@ public:
     QScrollArea *scrollArea;
     QWidget *infoWidgets ;
     QWidget *menuWidget;
+    QWidget *navigationWidget;
     QToolBar *toolBar;
+    QToolBar *navigationBar;
     QSlider *volumeSlider;
     QComboBox *playbackComboBox;
     PlaypauseButton *playpause;
     TimeSlider *timeSlider;
     QLabel *currTimeLabel;
     QPushButton *fullscreenButton;
+    QGridLayout *librariesLayout;
+    QPushButton *addLibrary;
+    QWidget *librariesWidget;
     int argc;
     QApplication *app;
     char *argv[];
@@ -82,8 +90,9 @@ public:
         for(int i=0;i<argc;i++)
             argv[i]=myArgv[i];
 
-
     };
+
+
     void createButtons();
     void removeButtons();
 
@@ -96,6 +105,10 @@ public:
     void createScroll();
     void createSearch();
     void createToolBar();
+    void showLibraries();
+    void hideLibraries();
+    void showTomeo();
+    void hideTomeo();
     vector<TheButtonInfo> getInfoIn (string loc);
     QString getNameFromURL(QUrl url);
 

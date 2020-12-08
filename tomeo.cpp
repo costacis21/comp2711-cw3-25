@@ -378,17 +378,100 @@ void Tomeo::createScroll(){
 
 void Tomeo::createToolBar(){
     menuWidget = new QWidget();
+    navigationWidget = new QWidget();
 
 
     toolBar = new QToolBar(menuWidget);
-    QAction *help = new QAction();
-    help->setText("Help");
+    navigationBar = new QToolBar(navigationWidget);
+
+
     QMessageBox *helpBox = new QMessageBox();
     helpBox->setText("For help please visit our site\n\nwww.tomeo.doesnotexist.tom");
     helpBox->setStandardButtons(QMessageBox::Ok);
     helpBox->setWindowTitle("Help");
-    toolBar->addAction(help);
-    QObject::connect(help, SIGNAL(hovered()), helpBox,SLOT(exec()));
+
+    QAction *help = toolBar->addAction("Help");
+    QAction *import = toolBar->addAction("Import");
+
+    QAction *goToLibraries = navigationBar->addAction("Libraries");
+    QAction *goToTomeo = navigationBar->addAction("Tomeo");
+
+    navigationBar->actions().at(1)->setVisible(false);
+
+    QObject::connect(help, SIGNAL(triggered()), helpBox,SLOT(exec()));
+    QObject::connect(goToLibraries, &QAction::triggered,[=](){hideTomeo();showLibraries();});
+    QObject::connect(goToTomeo, &QAction::triggered,[=](){hideLibraries();showTomeo();});
+
+
+}
+
+
+
+void Tomeo::showLibraries(){
+
+    if(libraries.size()>0)
+        for(int i=0;i<libraries.size()-1;i++)
+            libraries.at(i)->show();
+
+
+    QObject::connect(addLibrary,&QPushButton::clicked,[=](){
+        Library *newLib = new Library(librariesWidget);
+        libraries.push_back(newLib);
+
+        top->addWidget(newLib,1,5*libraries.size(),5,5);
+    });
+
+
+}
+
+void Tomeo::hideLibraries(){
+    if(libraries.size()>0)
+        for(int i=0;i<libraries.size()-1;i++)
+            libraries.at(i)->hide();
+}
+
+
+
+void Tomeo::showTomeo(){
+    videoWidget->show();
+
+    controlsWidget_1->show();
+
+    searchWidgets->show();
+
+    controlsWidget_2->show();
+
+    scrollArea->show();
+    infoWidgets->show();
+    navigationBar->actions().at(0)->setVisible(true);
+    toolBar->actions().at(1)->setVisible(true);
+    toolBar->show();
+
+    navigationBar->actions().at(1)->setVisible(false);
+
+}
+
+void Tomeo::hideTomeo(){
+    top->removeWidget(videoWidget);
+    top->removeWidget(controlsWidget_1);
+    top->removeWidget(searchWidgets);
+    top->removeWidget(controlsWidget_2);
+    top->removeWidget(scrollArea);
+    top->removeWidget(infoWidgets);
+    videoWidget->hide();
+
+    controlsWidget_1->hide();
+
+    searchWidgets->hide();
+
+    controlsWidget_2->hide();
+
+    scrollArea->hide();
+    infoWidgets->hide();
+    toolBar->actions().at(1)->setVisible(false);
+    navigationBar->actions().at(0)->setVisible(false);
+    navigationBar->actions().at(1)->setVisible(true);
+
 
 }
 
@@ -447,21 +530,26 @@ int Tomeo::show(){
     createSearch();
     createToolBar();
 
-
+    addLibrary = new QPushButton();
+    addLibrary->setText("+");
+    addLibrary->setStyleSheet("font:100pt;");
+    addLibrary->setFixedSize(100,100);
+    top->addWidget(addLibrary,0,0,5,5);
 
     // add video, the buttons and controls to the top level widget
     top->addWidget(videoWidget,1,0,6,6);
 
     top->addWidget(controlsWidget_1,7,0,1,6);
 
-    top->addWidget(searchWidgets,0,6,1,2);
+    top->addWidget(searchWidgets,1,6,1,2);
 
     top->addWidget(controlsWidget_2,7,6,1,2);
 
-    top->addWidget(scrollArea,1,6,6,2);
+    top->addWidget(scrollArea,2,6,5,2);
     top->addWidget(infoWidgets,8,0,1,1);
 
-    top->addWidget(toolBar,0,0);
+    top->addWidget(toolBar,0,0,1,3);
+    top->addWidget(navigationWidget,0,7,1,3);
 
 
 
