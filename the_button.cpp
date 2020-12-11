@@ -40,8 +40,7 @@ QString TheButtonInfo::miliToFormated(qint64 time){
 }
 
 QString TheButtonInfo::getDuration(){
-//    ThePlayer *tmpPlayer = new ThePlayer();
-//    tmpPlayer->setMedia(*this->url);
+
     return duration;
 
 

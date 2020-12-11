@@ -14,8 +14,7 @@
 
 using namespace std;
 
-QString Tomeo::getNameFromURL(QUrl url)
-{
+QString Tomeo::getNameFromURL(QUrl url){
     QString currUrl = url.toString();
     QStringList pieces = currUrl.split("/");
     QString neededWord = pieces.value(pieces.length() - 1);
@@ -24,8 +23,7 @@ QString Tomeo::getNameFromURL(QUrl url)
     return neededWord;
 }
 
-void Tomeo::removeButtons()
-{
+void Tomeo::removeButtons(){
 
     for (int i = 0; i < buttonsLayout->count(); i++) {
         if (searchParam.isEmpty()) {
@@ -49,8 +47,7 @@ void Tomeo::removeButtons()
 }
 
 // read in videos and thumbnails to this directory
-vector<TheButtonInfo> Tomeo::getInfoIn(QString loc)
-{
+vector<TheButtonInfo> Tomeo::getInfoIn(QString loc){
 
     vector<TheButtonInfo> out = vector<TheButtonInfo>();
     QDir dir(loc);
@@ -94,8 +91,7 @@ vector<TheButtonInfo> Tomeo::getInfoIn(QString loc)
     return out;
 }
 
-void Tomeo::createButtons()
-{
+void Tomeo::createButtons(){
 
     for (int i = 0; i < videos.size() - 1; i++) {
         // a row of buttons
@@ -198,8 +194,7 @@ void Tomeo::createButtons()
     }
 }
 
-void Tomeo::createConnections_controls_1()
-{
+void Tomeo::createConnections_controls_1(){
 
     QObject::connect(volumeButton, &QPushButton::clicked,
         [=]() { volumeVisible=!volumeVisible;volumeSlider->setVisible(volumeVisible); });
@@ -228,8 +223,7 @@ void Tomeo::createConnections_controls_1()
     });
 }
 
-void Tomeo::createControls_1()
-{
+void Tomeo::createControls_1(){
     //first line of controls
     volumeVisible = false;
 
@@ -325,8 +319,7 @@ void Tomeo::createControls_1()
     createConnections_controls_1();
 }
 
-void Tomeo::createControls_2()
-{ //second line of controls
+void Tomeo::createControls_2(){ //second line of controls
     controlsWidget_2 = new QWidget();
     controlsLayout_2 = new QHBoxLayout();
 
@@ -349,8 +342,7 @@ void Tomeo::createControls_2()
     QObject::connect(backwardButton, SIGNAL(clicked()), player, SLOT(backwards()));
 }
 
-void Tomeo::createInfos()
-{ //third line of controls
+void Tomeo::createInfos(){
     QGridLayout* infoLayout = new QGridLayout();
 
     infoWidgets->setLayout(infoLayout);
@@ -395,8 +387,7 @@ void Tomeo::createInfos()
         [=]() { currentlyPlayingName = getNameFromURL(player->currentMedia().canonicalUrl()); });
 }
 
-void Tomeo::createSearch()
-{
+void Tomeo::createSearch(){
     searchWidgets = new QWidget();
     QHBoxLayout* searchLayout = new QHBoxLayout();
     searchWidgets->setLayout(searchLayout);
@@ -432,8 +423,7 @@ void Tomeo::createSearch()
     });
 }
 
-void Tomeo::createScroll()
-{
+void Tomeo::createScroll(){
 
     buttonsLayout->setAlignment(Qt::AlignTop);
 
@@ -443,8 +433,7 @@ void Tomeo::createScroll()
     scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
-void Tomeo::createToolBar()
-{
+void Tomeo::createToolBar(){
     menuWidget = new QWidget();
     navigationWidget = new QWidget();
 
@@ -491,8 +480,7 @@ void Tomeo::createToolBar()
     });
 }
 
-void Tomeo::connectLibsToButtons()
-{
+void Tomeo::connectLibsToButtons(){
     for (int j = 0; j < libraries.size(); j++) {
         if (buttons.size() > 0)
             j = addToLibComboS.at(0)->count() - 1;
@@ -522,8 +510,7 @@ void Tomeo::connectLibsToButtons()
     }
 }
 
-void Tomeo::showLibraries()
-{
+void Tomeo::showLibraries(){
     top->removeWidget(firstTime);
     firstTime->hide();
     addLibrary->show();
@@ -533,8 +520,7 @@ void Tomeo::showLibraries()
         libraries.at(i)->show();
 }
 
-void Tomeo::hideLibraries()
-{
+void Tomeo::hideLibraries(){
 
     for (unsigned i = 0; i < libraries.size(); i++) {
         libraries.at(i)->hide();
@@ -544,8 +530,7 @@ void Tomeo::hideLibraries()
     addLibrary->hide();
 }
 
-void Tomeo::showTomeo()
-{
+void Tomeo::showTomeo(){
     videoWidget->show();
 
     controlsWidget_1->show();
@@ -563,8 +548,7 @@ void Tomeo::showTomeo()
     navigationBar->actions().at(1)->setVisible(false);
 }
 
-void Tomeo::hideTomeo()
-{
+void Tomeo::hideTomeo(){
     videoWidget->hide();
     controlsWidget_1->hide();
     searchWidgets->hide();
@@ -578,8 +562,7 @@ void Tomeo::hideTomeo()
     navigationBar->actions().at(1)->setVisible(true);
 }
 
-void Tomeo::createAddLibraryButton()
-{
+void Tomeo::createAddLibraryButton(){
     addLibrary = new QPushButton();
     addLibrary->setIcon(QIcon(":/icons/addLibrary.png"));
     addLibrary->setIconSize(QSize(75, 75));
@@ -602,8 +585,7 @@ void Tomeo::createAddLibraryButton()
     });
 }
 
-int Tomeo::setUpLayout()
-{
+int Tomeo::setUpLayout(){
 
     createControls_1();
     createControls_2();
@@ -656,8 +638,7 @@ int Tomeo::setUpLayout()
     return app->exec();
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]){
     QApplication app(argc, argv);
 
     Tomeo* tomeo = new Tomeo(&app, argc, argv);
