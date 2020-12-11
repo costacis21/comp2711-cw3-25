@@ -50,18 +50,18 @@ public:
     QString currentlyPlayingLocation;
     QWidget *buttonsWidget;
     QVBoxLayout *buttonsLayout;
-    QString searchParam;
+    QString searchParam="";
     QString playbackComboBoxName;
     bool volumeVisible;
     QPushButton *volumeButton;
-    QLabel *title;
+    QTextEdit *title;
     vector<TheButtonInfo> videos;
     MyVideoWidget *videoWidget;
     ThePlayer *player;
     QWidget *window;
     QGridLayout *top;
     QWidget *controlsWidget_1;
-    QHBoxLayout *controlsLayout_1;
+    QGridLayout *controlsLayout_1;
     QWidget *controlsWidget_2;
     QHBoxLayout *controlsLayout_2;
     QWidget *searchWidgets;
@@ -79,7 +79,14 @@ public:
     QPushButton *fullscreenButton;
     QGridLayout *librariesLayout;
     QPushButton *addLibrary;
+    vector <QComboBox*> addToLibComboS;
+    vector <QComboBox*> removeFromLibComboS;
     QWidget *librariesWidget;
+    QLabel *addLibraryInstruction;
+    vector <QPushButton*> bookmarks;
+    vector <QTextEdit*> bookmarkNames;
+    QPushButton *addBookmarkButton;
+    QLabel *firstTime;
     int argc;
     QApplication *app;
     char *argv[];
@@ -89,6 +96,29 @@ public:
         argc=myArgc;
         for(int i=0;i<argc;i++)
             argv[i]=myArgv[i];
+        // the widget that will show the video
+
+        videoWidget = new MyVideoWidget();
+        scrollArea = new QScrollArea();
+        infoWidgets = new QWidget();
+        buttonsLayout = new QVBoxLayout();
+        buttonsWidget = new QWidget();
+        buttonsWidget->setLayout(buttonsLayout);
+        firstTime=new QLabel("   Import Videos or Go to Libraries");
+        firstTime->setStyleSheet("font:30pt; font-weight:bold");
+
+        // the QMediaPlayer which controls the playback
+        player = new ThePlayer;
+
+        // create the main window and layout
+        window= new QWidget();
+        window->setStyleSheet("background-color:#FFFFFF;");
+
+        top = new QGridLayout();
+        top->setContentsMargins(0,0,0,0);
+        window->setLayout(top);
+        window->setWindowTitle("tomeo");
+        window->setMinimumSize(900, 680);
 
     };
 
@@ -105,14 +135,16 @@ public:
     void createScroll();
     void createSearch();
     void createToolBar();
+    void createAddLibraryButton();
     void showLibraries();
     void hideLibraries();
     void showTomeo();
     void hideTomeo();
-    vector<TheButtonInfo> getInfoIn (string loc);
+    void connectLibsToButtons();
+    vector<TheButtonInfo> getInfoIn (QString loc);
     QString getNameFromURL(QUrl url);
 
-    int show();
+    int setUpLayout();
 
 
 

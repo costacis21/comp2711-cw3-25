@@ -15,5 +15,10 @@
         <file>icons/search.png</file>
         <file>icons/fullscreen.png</file>
         <file>icons/volume.png</file>
+        <file>icons/addBookmark.png</file>
+        <file>icons/newBookmark.png</file>
+        <file>icons/editText.png</file>
+        <file>icons/noEditText.png</file>
+        <file>icons/addLibrary.png</file>
     </qresource>
 </RCC>

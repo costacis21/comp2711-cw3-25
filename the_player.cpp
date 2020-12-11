@@ -12,7 +12,6 @@ using namespace std;
 void ThePlayer::setContent(std::vector<TheButton*>* b, std::vector<TheButtonInfo>* i) {
     buttons = b;
     infos = i;
-
     jumpTo(buttons -> at(0) -> info);
 }
 

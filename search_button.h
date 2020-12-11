@@ -16,6 +16,8 @@ public:
          setIcon(QIcon(":/icons/search.png"));
          setIconSize(QSize(20,20));
          setFlat(true);
+         setCursor(QCursor(Qt::PointingHandCursor));
+
      }
 
 

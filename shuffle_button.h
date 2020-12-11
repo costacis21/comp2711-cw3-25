@@ -13,6 +13,8 @@ public:
          setFlat(true);
          connect(this,SIGNAL(clicked()),this,SLOT(repeatChanged()));
          setFocusPolicy(Qt::NoFocus);
+         setCursor(QCursor(Qt::PointingHandCursor));
+
      }
 
      void init();

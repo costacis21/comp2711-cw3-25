@@ -15,6 +15,7 @@ public:
          setIconSize(QSize(50,50));
          setFlat(true);
          connect(this,SIGNAL(clicked()),this,SLOT(repeatChanged()));
+         setCursor(QCursor(Qt::PointingHandCursor));
          setFocusPolicy(Qt::NoFocus);
      }
 

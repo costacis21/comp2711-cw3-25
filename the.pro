@@ -9,6 +9,7 @@ CONFIG += c++11
 
 SOURCES += \
         backward_button.cpp \
+        custom_textbox.cpp \
         forward_button.cpp \
         library.cpp \
         my_videowidget.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
     backward_button.h \
+    custom_textbox.h \
     forward_button.h \
     library.h \
     my_videowidget.h \

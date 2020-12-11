@@ -17,6 +17,8 @@ public:
         setFlat(true);
         setIconSize(QSize(50,50));
         setFocusPolicy(Qt::NoFocus);
+        setCursor(QCursor(Qt::PointingHandCursor));
+
 
      }
 
