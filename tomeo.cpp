@@ -418,10 +418,13 @@ void createSearch(){
     searchLayout->addWidget(sortingCombobox);
 
     //search connections
-        QObject::connect(searchButton, &QPushButton::clicked, removeButtons);
-        QObject::connect(searchBox, &QTextEdit::textChanged, [&] {
-           searchParam=searchBox->toPlainText();
+        QObject::connect(searchButton, &QPushButton::clicked,[=](){
+            QObject::connect(searchBox, &QTextEdit::textChanged, [&] {
+               searchParam=searchBox->toPlainText();
+            });
+            removeButtons();
         });
+
 }
 
 void createScroll(){
@@ -451,7 +454,7 @@ void createToolBar(){
     helpBox->setStandardButtons(QMessageBox::Ok);
     helpBox->setWindowTitle("Help");
     toolBar->addAction(help);
-    QObject::connect(help, SIGNAL(hovered()), helpBox,SLOT(exec()));
+    QObject::connect(help, SIGNAL(triggered()), helpBox,SLOT(exec()));
 
 }
 
